@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Crypto Streak Screener (Bybit)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Inter", system-ui, sans-serif;
+        background: #050816;
+        color: #f5f5f5;
+      }
+      .wrapper {
+        max-width: 1300px;
+        margin: auto;
+        padding: 30px 16px 40px;
+      }
+      h1 {
+        margin: 0 0 6px;
+        font-size: 30px;
+        font-weight: 600;
+      }
+      .subtitle {
+        margin-bottom: 18px;
+        font-size: 13px;
+        color: #9ca3af;
+      } /* Controls */
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        background: radial-gradient(circle at top left, #111827, #020617);
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #1f2937;
+        margin-bottom: 16px;
+      }
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        min-width: 100px;
+        gap: 4px;
+      }
+      .control-group.threshold {
+        width: 120px;
+      }
+      .control-group.refresh-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      label {
+        font-size: 13px;
+        color: #9ca3af;
+      }
+      input,
+      select {
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid #374151;
+        background: #020617;
+        color: #fff;
+        font-size: 14px;
+      }
+      .btn {
+        padding: 12px 22px;
+        border-radius: 99px;
+        background: linear-gradient(135deg, #2563eb, #4f46e5);
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        transition: transform 0.1s ease, box-shadow 0.15s ease;
+      }
+      .btn:active {
+        transform: scale(0.96);
+        box-shadow: 0 0 0 rgba(0, 0, 0, 0.3);
+      } /* Status */
+      .status-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+        font-size: 13px;
+        color: #9ca3af;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #22c55e;
+      }
+      .dot.loading {
+        background: #facc15;
+      }
+      .dot.error {
+        background: #ef4444;
+      } /* Table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        border: 1px solid #1f2937;
+        background: #020617;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      thead {
+        background: #030712;
+      }
+      th {
+        padding: 8px 10px;
+        color: #9ca3af;
+        border-bottom: 1px solid #111827;
+        text-align: left;
+      }
+      td {
+        padding: 8px 10px;
+        white-space: nowrap;
+      }
+      td.symbol {
+        font-weight: 600;
+        font-size: 13px;
+      }
+      td.small-text {
+        font-size: 11px;
+        color: #9ca3af;
+      } /* Row borders */
+      .row-bull {
+        box-shadow: inset 3px 0 0 #22c55e;
+      }
+      .row-bear {
+        box-shadow: inset 3px 0 0 #ef4444;
+      }
+      .row-neutral {
+        box-shadow: inset 3px 0 0 #4b5563;
+      } /* Hover */
+      tbody tr:hover {
+        background: rgba(59, 130, 246, 0.12);
+        cursor: pointer;
+      } /* Streak number color (matches row border) */
+      .streak-bull {
+        color: #22c55e;
+        font-weight: 700;
+      }
+      .streak-bear {
+        color: #ef4444;
+        font-weight: 700;
+      }
+      .streak-neutral {
+        color: #9ca3af;
+      } /* Gain color */
+      .gain-bull {
+        color: #22c55e;
+      }
+      .gain-bear {
+        color: #ef4444;
+      }
+      .gain-neutral {
+        color: #9ca3af;
+      } /* Badge */
+      .badge {
+        padding: 2px 6px;
+        border-radius: 999px;
+        font-size: 12px;
+      }
+      .badge.yes {
+        background: rgba(22, 163, 74, 0.2);
+        color: #4ade80;
+      }
+      .badge.no {
+        background: rgba(239, 68, 68, 0.2);
+        color: #fb7185;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <h1>Crypto Streak Screener (Bybit)</h1>
+      <div class="subtitle">
+        Shows only <b>one streak</b> and <b>one gain</b> (bull OR bear). Row
+        color reveals streak direction.
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <div class="control-group" style="flex: 1 1 260px">
+          <label>Symbols</label>
+          <input id="symbolsInput" value="BTCUSDT, ETHUSDT, SOLUSDT" />
+        </div>
+
+        <div class="control-group">
+          <label>Streak Rule</label>
+          <select id="ruleSelect">
+            <option value="strong" selected>Strong (C > C)</option>
+            <option value="weak">Weak (C > O)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Interval</label>
+          <select id="intervalSelect">
+            <option value="1">1m</option>
+            <option value="3">3m</option>
+            <option value="5" selected>5m</option>
+            <option value="15">15m</option>
+          </select>
+        </div>
+
+        <div class="control-group threshold">
+          <label>Streak Threshold</label>
+          <input id="thresholdInput" type="number" value="3" min="1" />
+        </div>
+
+        <div class="control-group">
+          <label>Auto Refresh</label>
+          <select id="refreshSelect">
+            <option value="0">None</option>
+            <option value="10" selected>10s</option>
+            <option value="30">30s</option>
+            <option value="60">1m</option>
+          </select>
+        </div>
+
+        <div class="control-group refresh-btn">
+          <button id="refreshButton" class="btn">Refresh</button>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <span
+          ><span id="statusDot" class="dot"></span>
+          <span id="statusText">Idle</span></span
+        >
+        <span id="lastUpdated">Last updated: -</span>
+      </div>
+
+      <div class="status-row">
+        <span id="currentTime">Current Time: -</span>
+        <span id="nextRefresh">Next Refresh In: -</span>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Price</th>
+            <th>Gain %</th>
+            <th>Streak</th>   
+            <th>Funding</th>
+            <th>Next Funding</th>
+            <th>OHLC</th>
+            <th>Match?</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <script>
+      const API_KLINE = "https://api.bybit.com/v5/market/kline";
+      const API_TICKER = "https://api.bybit.com/v5/market/tickers";
+      const MAX_BARS = 15;
+
+      let autoTimer = null;
+      let countdown = 10;
+      let fetching = false;
+
+      const symbolsInput = document.getElementById("symbolsInput");
+      const intervalSelect = document.getElementById("intervalSelect");
+      const thresholdInput = document.getElementById("thresholdInput");
+      const refreshSelect = document.getElementById("refreshSelect");
+      const refreshButton = document.getElementById("refreshButton");
+      const resultsBody = document.getElementById("resultsBody");
+      const statusDot = document.getElementById("statusDot");
+      const statusText = document.getElementById("statusText");
+      const lastUpdated = document.getElementById("lastUpdated");
+      const currentTimeEl = document.getElementById("currentTime");
+      const nextRefreshEl = document.getElementById("nextRefresh");
+      const ruleSelect = document.getElementById("ruleSelect");
+
+      function fmt(n, d = 4) {
+        const x = parseFloat(n);
+        return isNaN(x) ? "-" : x.toFixed(d);
+      }
+
+      function msToCountdown(ms) {
+          const totalSeconds = Math.floor(ms / 1000);
+          const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+          const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+          const seconds = String(totalSeconds % 60).padStart(2, "0");
+          return `${hours} : ${minutes} : ${seconds}`;
+      }
+
+
+      async function fetchFunding(symbol) {
+        const r = await fetch(
+          `${API_TICKER}?category=linear&symbol=${symbol}`
+        ).then((r) => r.json());
+        if (r.retCode !== 0) return null;
+        return r.result.list[0];
+      }
+
+      async function fetchOHLC(symbol, interval) {
+        const r = await fetch(
+          `${API_KLINE}?category=linear&symbol=${symbol}&interval=${interval}&limit=${
+            MAX_BARS + 1
+          }`
+        ).then((r) => r.json());
+        if (r.retCode !== 0) throw new Error(r.retMsg);
+        return r.result.list;
+      }
+
+      function calcStreak(candles, type, rule) {
+        let count = 0;
+
+        for (let i = 0; i < MAX_BARS; i++) {
+          const cur = candles[i],
+            prev = candles[i + 1];
+          if (!cur || !prev) break;
+
+          const close = parseFloat(cur[4]);
+          const prevClose = parseFloat(prev[4]);
+          const prevOpen = parseFloat(prev[1]);
+
+          let condition;
+
+          if (rule === "strong") {
+            // strong rule: close > prev close
+            condition = type === "bull" ? close > prevClose : close < prevClose;
+          } else {
+            // weak rule: close > prev open
+            condition = type === "bull" ? close > prevOpen : close < prevOpen;
+          }
+
+          if (condition) count++;
+          else break;
+        }
+
+        let gain = 0;
+        if (count > 0) {
+          const lastClose = parseFloat(candles[0][4]);
+          const startOpen = parseFloat(candles[count - 1][1]);
+          gain = ((lastClose - startOpen) / startOpen) * 100;
+        }
+
+        return { count, gain };
+      }
+
+      function pickStreak(bull, bear) {
+        if (bull.count > 0 && bear.count === 0) return { dir: "bull", ...bull };
+        if (bear.count > 0 && bull.count === 0) return { dir: "bear", ...bear };
+        if (bull.count === 0 && bear.count === 0)
+          return { dir: "none", count: 0, gain: 0 };
+        return bull.count >= bear.count
+          ? { dir: "bull", ...bull }
+          : { dir: "bear", ...bear };
+      }
+
+      async function updateScreener() {
+        const symbols = symbolsInput.value
+          .split(",")
+          .map((x) => x.trim().toUpperCase())
+          .filter(Boolean);
+        const interval = intervalSelect.value;
+        const threshold = parseInt(thresholdInput.value) || 3;
+        const rule = document.getElementById("ruleSelect").value;
+
+        if (fetching) return;
+        fetching = true;
+
+        statusDot.classList.add("loading");
+        statusText.textContent = "Loading...";
+
+        const rows = [];
+
+        for (const sym of symbols) {
+          try {
+            const [candles, ticker] = await Promise.all([
+              fetchOHLC(sym, interval),
+              fetchFunding(sym),
+            ]);
+
+            const last = candles[0];
+            const O = last[1],
+              H = last[2],
+              L = last[3],
+              C = last[4];
+            const funding = parseFloat(ticker.fundingRate) * 100
+            const fundingCountdown = msToCountdown(ticker.nextFundingTime - Date.now());
+
+            const bull = calcStreak(candles, "bull", rule);
+            const bear = calcStreak(candles, "bear", rule);
+            const streak = pickStreak(bull, bear);
+
+            const match = streak.count >= threshold;
+
+            const rowClass =
+              match && streak.dir === "bull"
+                ? "row-bull"
+                : match && streak.dir === "bear"
+                ? "row-bear"
+                : "row-neutral";
+
+            rows.push({
+              sym,
+              price: C,
+              funding,
+              fundingCountdown,
+              streakCount: streak.count,
+              streakDir: streak.dir,
+              streakGain: streak.gain,
+              O,
+              H,
+              L,
+              C,
+              match,
+              rowClass,
+            });
+          } catch (e) {
+            rows.push({ sym, error: e.message });
+          }
+        }
+
+        renderRows(rows);
+        fetching = false;
+
+        statusDot.classList.remove("loading");
+        statusText.textContent = "Updated";
+        lastUpdated.textContent =
+          "Last updated: " + new Date().toLocaleTimeString();
+        countdown = parseInt(refreshSelect.value) || 0;
+      }
+
+      function renderRows(rows) {
+        resultsBody.innerHTML = rows
+          .map((r) => {
+            if (r.error) {
+              return `<tr class="row-neutral"><td>${r.sym}</td><td colspan="6" class="negative">${r.error}</td></tr>`;
+            }
+
+            const streakClass = r.match
+              ? r.streakDir === "bull"
+                ? "streak-bull"
+                : "streak-bear"
+              : "streak-neutral";
+
+            const gainClass =
+              r.streakDir === "bull"
+                ? "gain-bull"
+                : r.streakDir === "bear"
+                ? "gain-bear"
+                : "gain-neutral";
+
+            const fundingClass = r.funding >= 0 ? "gain-bull" : "gain-bear";
+
+            return `
+            <tr class="${r.rowClass}">
+              <td class="symbol">${r.sym}</td>
+              <td>${fmt(r.price)}</td>
+              <td class="${gainClass}">${
+              r.streakCount > 0 ? fmt(r.streakGain, 2) + "%" : "-"
+            }</td>             
+              <td class="${streakClass}">${r.streakCount}</td>
+              <td class="${fundingClass}">${fmt(r.funding, 4)}%</td>
+              <td class = "streak-neutral">${r.fundingCountdown}</td>
+              <td class="small-text">O:${fmt(r.O)} H:${fmt(r.H)} L:${fmt(
+              r.L
+            )} C:${fmt(r.C)}</td>
+              <td><span class="badge ${r.match ? "yes" : "no"}">${
+              r.match ? "YES" : "NO"
+            }</span></td>
+            </tr>
+          `;
+          })
+          .join("");
+      }
+
+      function startAutoRefresh() {
+        if (autoTimer) clearInterval(autoTimer);
+        const sec = parseInt(refreshSelect.value) || 0;
+
+        if (sec === 0) {
+          nextRefreshEl.textContent = "Next Refresh In: Disabled";
+          return;
+        }
+
+        countdown = sec;
+        nextRefreshEl.textContent = `Next Refresh In: ${countdown}s`;
+
+        autoTimer = setInterval(() => {
+          countdown--;
+          if (countdown <= 0) updateScreener();
+          nextRefreshEl.textContent = `Next Refresh In: ${countdown}s`;
+        }, 1000);
+      }
+
+      setInterval(() => {
+        currentTimeEl.textContent =
+          "Current Time: " + new Date().toLocaleTimeString();
+      }, 1000);
+
+      refreshButton.addEventListener("click", updateScreener);
+      refreshSelect.addEventListener("change", startAutoRefresh);
+      intervalSelect.addEventListener("change", updateScreener);
+      thresholdInput.addEventListener("change", updateScreener);
+      ruleSelect.addEventListener("change", updateScreener);
+
+      updateScreener();
+      startAutoRefresh();
+    </script>
+  </body>
+</html>
