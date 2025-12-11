@@ -116,6 +116,10 @@
         border-radius: 12px;
         overflow: hidden;
       }
+      .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
       thead {
         background: #030712;
       }
@@ -201,14 +205,18 @@
       <div class="controls">
         <div class="control-group" style="flex: 1 1 260px">
           <label>Symbols</label>
-          <input id="symbolsInput" value="BTCUSDT, ETHUSDT, SOLUSDT, DOGEUSDT" name="symbolsInput"/>
+          <input
+            id="symbolsInput"
+            value="BTCUSDT, ETHUSDT, SOLUSDT, DOGEUSDT"
+            name="symbolsInput"
+          />
         </div>
 
         <div class="control-group">
           <label>Streak Rule</label>
           <select id="ruleSelect">
             <option value="weak" selected>Weak (C > O)</option>
-            <option value="strong" >Strong (C > C)</option>  
+            <option value="strong">Strong (C > C)</option>
           </select>
         </div>
 
@@ -226,7 +234,7 @@
 
         <div class="control-group threshold">
           <label>Streak Threshold</label>
-          <input id="thresholdInput" type="number" value="3" min="1" max="14"/>
+          <input id="thresholdInput" type="number" value="3" min="1" max="14" />
         </div>
 
         <div class="control-group">
@@ -258,22 +266,24 @@
         <span id="nextRefresh">Next Refresh In: -</span>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Symbol</th>
-            <th>Price</th>
-            <th>Gain %</th>
-            <th>Streak</th>   
-            <th>Funding</th>
-            <th>Next Funding</th>
-            <th>RSI</th>
-            <th>OHLC</th>
-            <th>Match?</th>
-          </tr>
-        </thead>
-        <tbody id="resultsBody"></tbody>
-      </table>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Price</th>
+              <th>Gain %</th>
+              <th>Streak</th>
+              <th>Funding</th>
+              <th>Next Funding</th>
+              <th>RSI</th>
+              <th>OHLC</th>
+              <th>Match?</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
     </div>
 
     <script>
@@ -304,13 +314,15 @@
       }
 
       function msToCountdown(ms) {
-          const totalSeconds = Math.floor(ms / 1000);
-          const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
-          const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
-          const seconds = String(totalSeconds % 60).padStart(2, "0");
-          return `${hours} : ${minutes} : ${seconds}`;
+        const totalSeconds = Math.floor(ms / 1000);
+        const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+        const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
+          2,
+          "0"
+        );
+        const seconds = String(totalSeconds % 60).padStart(2, "0");
+        return `${hours} : ${minutes} : ${seconds}`;
       }
-
 
       async function fetchFunding(symbol) {
         const r = await fetch(
@@ -375,34 +387,34 @@
         // Calculate average gain/loss over the first period
         for (let i = 0; i < length; i++) {
           const closeNow = parseFloat(candles[i][4]);
-          const closePrev = parseFloat(candles[i+1][4]);
+          const closePrev = parseFloat(candles[i + 1][4]);
           const diff = closeNow - closePrev;
-        
+
           if (diff > 0) gains += diff;
           else losses -= diff; // diff is negative
         }
-      
+
         let avgGain = gains / length;
         let avgLoss = losses / length;
-      
+
         // Wilder smoothing — continue with remaining candles
         for (let i = length; i < candles.length - 1; i++) {
           const closeNow = parseFloat(candles[i][4]);
-          const closePrev = parseFloat(candles[i+1][4]);
+          const closePrev = parseFloat(candles[i + 1][4]);
           const diff = closeNow - closePrev;
-        
+
           let gain = diff > 0 ? diff : 0;
           let loss = diff < 0 ? -diff : 0;
-        
+
           avgGain = (avgGain * (length - 1) + gain) / length;
           avgLoss = (avgLoss * (length - 1) + loss) / length;
         }
-      
+
         if (avgLoss === 0) return 100; // cannot divide by zero → RSI max
-      
+
         const rs = avgGain / avgLoss;
         const rsiVal = 100 - 100 / (1 + rs);
-      
+
         return rsiVal;
       }
 
@@ -446,8 +458,10 @@
               L = last[3],
               C = last[4];
 
-            const funding = parseFloat(ticker.fundingRate) * 100
-            const fundingCountdown = msToCountdown(ticker.nextFundingTime - Date.now());
+            const funding = parseFloat(ticker.fundingRate) * 100;
+            const fundingCountdown = msToCountdown(
+              ticker.nextFundingTime - Date.now()
+            );
 
             const rsi = computeRSI(candles);
 
@@ -455,7 +469,10 @@
             const bear = calcStreak(candles, "bear", rule);
             const streak = pickStreak(bull, bear);
 
-            const match = streak.count >= threshold && ((streak.dir === "bull" && funding < 0) || (streak.dir === "bear" && funding > 0.005));
+            const match =
+              streak.count >= threshold &&
+              ((streak.dir === "bull" && funding < 0) ||
+                (streak.dir === "bear" && funding > 0.005));
 
             const passTreshold = streak.count >= threshold;
 
@@ -520,7 +537,8 @@
 
             const fundingClass = r.funding >= 0 ? "gain-bull" : "gain-bear";
 
-            const rsiClass = (r.rsi >= 70 ||  r.rsi <= 30) ? "gain-warn" : "gain-neutral";
+            const rsiClass =
+              r.rsi >= 70 || r.rsi <= 30 ? "gain-warn" : "gain-neutral";
 
             return `
             <tr class="${r.rowClass}">
