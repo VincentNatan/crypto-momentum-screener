@@ -167,6 +167,9 @@
       .gain-bear {
         color: #ef4444;
       }
+      .gain-warn {
+        color: #fcd247;
+      }
       .gain-neutral {
         color: #9ca3af;
       } /* Badge */
@@ -204,8 +207,8 @@
         <div class="control-group">
           <label>Streak Rule</label>
           <select id="ruleSelect">
-            <option value="strong" selected>Strong (C > C)</option>
-            <option value="weak">Weak (C > O)</option>
+            <option value="weak" selected>Weak (C > O)</option>
+            <option value="strong" >Strong (C > C)</option>  
           </select>
         </div>
 
@@ -216,6 +219,8 @@
             <option value="3">3m</option>
             <option value="5">5m</option>
             <option value="15">15m</option>
+            <option value="60">1h</option>
+            <option value="240">4h</option>
           </select>
         </div>
 
@@ -228,6 +233,7 @@
           <label>Auto Refresh</label>
           <select id="refreshSelect">
             <option value="0">None</option>
+            <option value="5">5s</option>
             <option value="10" selected>10s</option>
             <option value="30">30s</option>
             <option value="60">1m</option>
@@ -449,7 +455,7 @@
             const bear = calcStreak(candles, "bear", rule);
             const streak = pickStreak(bull, bear);
 
-            const match = streak.count >= threshold;
+            const match = streak.count >= threshold && ((streak.dir === "bull" && funding < 0) || (streak.dir === "bear" && funding > 0));
 
             const rowClass =
               match && streak.dir === "bull"
@@ -511,7 +517,7 @@
 
             const fundingClass = r.funding >= 0 ? "gain-bull" : "gain-bear";
 
-            const rsiClass = r.rsi >= 70 ? "gain-bear" : r.rsi <= 30 ? "gain-bull" : "gain-neutral";
+            const rsiClass = (r.rsi >= 70 ||  r.rsi <= 30) ? "gain-warn" : "gain-neutral";
 
             return `
             <tr class="${r.rowClass}">
