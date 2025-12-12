@@ -617,7 +617,7 @@
 
             const rsiClass = r.rsi >= 70 || r.rsi <= 30 ? "gain-warn" : "gain-neutral";
 
-            const volumeSpikeClass = r.volumeSpike >= 2 ? "gain-warn" : "gain-neutral";
+            const volumeSpikeClass = r.volumeSpike >= 2 ? "" : "gain-neutral";
 
             return `
             <tr class="${r.rowClass}">
