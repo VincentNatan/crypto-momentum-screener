@@ -291,6 +291,8 @@
           <button onclick="fetchTop10Symbols('Gainers')" class="quick-btn">Gainer</button>
           <button onclick="fetchTop10Symbols('Losers')" class="quick-btn">Losers</button>
           <button onclick="fetchTop10Symbols('Volume')" class="quick-btn">Volume</button>
+          <button onclick="fetchTop10Symbols('negative-funding')" class="quick-btn">Negative Funding</button>
+          <button onclick="fetchTop10Symbols('positive-funding')" class="quick-btn">Positive Funding</button>
       </div>
 
       <div class="status-row">
@@ -354,7 +356,7 @@
         return isNaN(x) ? "-" : x.toFixed(d);
       }
 
-      async function fetchTop10Symbols(rule){
+      async function fetchTop10Symbols(rule, limit=10) {
         const r = await fetch(`${API_TICKER}?category=linear`).then((r) => r.json());
         if (r.retCode !== 0) {
           alert("Failed to fetch data");
@@ -369,10 +371,14 @@
             listData.sort((a, b) => parseFloat(a.price24hPcnt) - parseFloat(b.price24hPcnt));
         } else if (rule === "Volume") {
             listData.sort((a, b) => parseFloat(b.turnover24h) - parseFloat(a.turnover24h));
+        }else if (rule === "negative-funding") {
+            listData.sort((a, b) => parseFloat(a.fundingRate) - parseFloat(b.fundingRate));
+        }else if (rule === "positive-funding") {
+            listData.sort((a, b) => parseFloat(b.fundingRate) - parseFloat(a.fundingRate));
         }
 
 
-        const top10Symbols = listData.slice(0, 10).map(item => item.symbol);
+        const top10Symbols = listData.slice(0, limit).map(item => item.symbol);
         document.getElementById("symbolsInput").value = top10Symbols.join(", ");
         updateScreener()
       }
