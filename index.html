@@ -355,14 +355,15 @@
         return isNaN(x) ? "-" : x.toFixed(d);
       }
 
-      async function fetchTop10Symbols(rule, limit=10) {
-        const r = await fetch(`${API_TICKER}?category=linear`).then((r) => r.json());
-        if (r.retCode !== 0) {
-          alert("Failed to fetch data");
-          return;
-        }
+      async function fetchTickerAll() {
+        const r = await fetch(`${API_TICKER}?category=linear`).then((r) => r.json(), { cache: "no-store" });
+        if (r.retCode !== 0) alert("Failed to fetch data");
+        return r.result.list
+      }
 
-        let listData = r.result.list;
+      async function fetchTop10Symbols(rule, limit=10) {
+
+        let listData = await fetchTickerAll();
 
         if (rule === "Gainers") {
             listData.sort((a, b) => parseFloat(b.price24hPcnt) - parseFloat(a.price24hPcnt));
