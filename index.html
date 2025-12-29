@@ -428,19 +428,25 @@
           const cur = candles[i],
             prev = candles[i + 1];
           if (!cur || !prev) break;
-
+          
+          const open = parseFloat(cur[1]);
           const close = parseFloat(cur[4]);
           const prevClose = parseFloat(prev[4]);
           const prevOpen = parseFloat(prev[1]);
+
+          const curGreen = close > open 
+          const curRed = close < open
+          const prevGreen = prevClose > prevOpen
+          const prevRed = prevClose < prevOpen
 
           let condition;
 
           if (rule === "strong") {
             // strong rule: close > prev close
-            condition = type === "bull" ? close > prevClose : close < prevClose;
+            condition = type === "bull" ? (prevGreen && curGreen) : (prevRed && curRed);
           } else {
             // weak rule: close > prev open
-            condition = type === "bull" ? close > prevOpen : close < prevOpen;
+            condition = type === "bull" ? close >= prevOpen : close <= prevOpen;
           }
 
           if (condition) count++;
@@ -448,7 +454,7 @@
         }
 
         let gain = 0;
-        if (count > 0) {
+        if (count >= 0) {
           const lastClose = parseFloat(candles[0][4]);
           const startOpen = parseFloat(candles[count][1]);
           gain = ((lastClose - startOpen) / startOpen) * 100;
@@ -546,7 +552,7 @@
         if (bull.count > 0 && bear.count === 0) return { dir: "bull", ...bull };
         if (bear.count > 0 && bull.count === 0) return { dir: "bear", ...bear };
         if (bull.count === 0 && bear.count === 0)
-          return { dir: "none", count: 0, gain: 0 };
+          return { dir: "none", ...bull };
         return bull.count >= bear.count
           ? { dir: "bull", ...bull }
           : { dir: "bear", ...bear };
@@ -681,7 +687,7 @@
               <td>${fmt(r.price)}</td>
               <td class="${gainClass}">${
               r.streakCount > 0 ? fmt(r.streakGain, 2) + "%" : "-"
-            }</td>             
+            }</td>              
               <td class="${streakClass}">${r.streakCount}</td>
               <td class="${fundingClass}">${fmt(r.funding, 4)}%</td>
               <td class="${fundingCountdownClass}">${r.fundingCountdown}</td>
