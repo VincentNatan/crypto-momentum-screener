@@ -450,7 +450,7 @@
         let gain = 0;
         if (count > 0) {
           const lastClose = parseFloat(candles[0][4]);
-          const startOpen = parseFloat(candles[count - 1][1]);
+          const startOpen = parseFloat(candles[count][1]);
           gain = ((lastClose - startOpen) / startOpen) * 100;
         }
 
