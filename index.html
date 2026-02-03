@@ -248,6 +248,7 @@
             <option value="weak" selected>Weak</option>
             <option value="strong">Strong</option>
             <option value="engulfing">Engulfing</option>
+            <option value="candle">Candle</option>
           </select>
         </div>
 
@@ -448,9 +449,12 @@
           } else if (rule === "strong") {
             // strong rule: close > prev close
             condition = type === "bull" ? (prevGreen && curGreen) : (prevRed && curRed);
-          } else {
+          } else if (rule === "weak") {
             // weak rule: close > prev open
             condition = type === "bull" ? close >= prevOpen : close <= prevOpen;
+          } else if (rule === "candle") {
+            // default rule: candle
+            condition = i == 1 
           }
 
           if (condition) count++;
@@ -463,6 +467,8 @@
           const startOpen = parseFloat(candles[count][1]);
           gain = ((lastClose - startOpen) / startOpen) * 100;
         }
+
+        if (rule === "candle") count = 1
 
         return { count, gain };
       }
