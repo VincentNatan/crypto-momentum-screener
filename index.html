@@ -675,12 +675,12 @@
                 ? "streak-bull"
                 : "streak-bear"
               : "streak-neutral";
-
-            const gainClass =
-              r.streakDir === "bull"
-                ? "gain-bull"
-                : r.streakDir === "bear"
-                ? "gain-bear"
+              
+            const gainClass = 
+              r.streakGain > 0 
+                ? "gain-bull" 
+                : r.streakGain < 0 
+                ? "gain-bear" 
                 : "gain-neutral";
 
             const fundingClass = r.funding >= 0 ? "gain-bull" : "gain-bear";
