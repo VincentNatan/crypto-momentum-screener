@@ -677,9 +677,9 @@
               : "streak-neutral";
               
             const gainClass = 
-              r.streakGain > 0 
+              (r.streakGain > 0 && r.streakCount > 0) 
                 ? "gain-bull" 
-                : r.streakGain < 0 
+                : (r.streakGain < 0 && r.streakCount > 0)
                 ? "gain-bear" 
                 : "gain-neutral";
 
