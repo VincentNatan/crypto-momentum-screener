@@ -335,6 +335,7 @@
       const API_KLINE = API_BASE + "/v5/market/kline";
       const API_TICKER = API_BASE + "/v5/market/tickers";
       const MAX_BARS = 22;
+      const OHLC_CONCURRENCY = 5;
 
       let autoTimer = null;
       let countdown = 10;
@@ -584,76 +585,86 @@
         statusDot.classList.add("loading");
         statusText.textContent = "Loading...";
 
-        const rows = [];
+        const rows = new Array(symbols.length);
+        const tickerList = await fetchTickerAll();
+        const tickerMap = new Map(tickerList.map((t) => [t.symbol, t]));
+        let cursor = 0;
+        const workerCount = Math.min(OHLC_CONCURRENCY, symbols.length);
 
-        for (const sym of symbols) {
-          try {
-            const [candles, ticker] = await Promise.all([
-              fetchOHLC(sym, interval),
-              fetchFunding(sym),
-            ]);
+        async function worker() {
+          while (true) {
+            const i = cursor++;
+            if (i >= symbols.length) break;
+            const sym = symbols[i];
 
-            const last = candles[0];
-            const O = last[1],
-              H = last[2],
-              L = last[3],
-              C = last[4];
+            try {
+              const candles = await fetchOHLC(sym, interval);
+              const ticker = tickerMap.get(sym);
+              if (!ticker) throw new Error("Ticker not found");
 
-            const funding = parseFloat(ticker.fundingRate) * 100;
-            const fundingCountdown = msToCountdown(
-              ticker.nextFundingTime - Date.now()
-            );
-            const fundingInterval = ticker.fundingIntervalHour;
+              const last = candles[0];
+              const O = last[1],
+                H = last[2],
+                L = last[3],
+                C = last[4];
 
-            const rsi = computeRSI(candles);
-            const volumeSpike = countVolumeSpikes(candles);
-            const atr = calculateATRPercent(candles);
+              const funding = parseFloat(ticker.fundingRate) * 100;
+              const fundingCountdown = msToCountdown(
+                ticker.nextFundingTime - Date.now()
+              );
+              const fundingInterval = ticker.fundingIntervalHour;
 
-            const bull = calcStreak(candles, "bull", rule);
-            const bear = calcStreak(candles, "bear", rule);
-            const streak = pickStreak(bull, bear);
+              const rsi = computeRSI(candles);
+              const volumeSpike = countVolumeSpikes(candles);
+              const atr = calculateATRPercent(candles);
 
-            const match =
-              streak.count >= threshold &&
-              ((streak.dir === "bull" && funding < 0) ||
-                (streak.dir === "bear" && funding > 0.005));
+              const bull = calcStreak(candles, "bull", rule);
+              const bear = calcStreak(candles, "bear", rule);
+              const streak = pickStreak(bull, bear);
 
-            const passTreshold = streak.count >= threshold;
+              const match =
+                streak.count >= threshold &&
+                ((streak.dir === "bull" && funding < 0) ||
+                  (streak.dir === "bear" && funding > 0.005));
 
-            const rowClass =
-              passTreshold && streak.dir === "bull"
-                ? "row-bull"
-                : passTreshold && streak.dir === "bear"
-                ? "row-bear"
-                : "row-neutral";
+              const passTreshold = streak.count >= threshold;
 
-            rows.push({
-              sym,
-              price: C,
-              funding,
-              fundingCountdown: fundingCountdown.text,
-              fundingHours: fundingCountdown.hours,
-              fundingMinutes: fundingCountdown.minutes,
-              fundingInterval,
-              streakCount: streak.count,
-              streakDir: streak.dir,
-              streakGain: streak.gain,
-              rsi,
-              atr,
-              volumeSpike,
-              O,
-              H,
-              L,
-              C,
-              match,
-              passTreshold,
-              rowClass,
-            });
-          } catch (e) {
-            rows.push({ sym, error: e.message });
+              const rowClass =
+                passTreshold && streak.dir === "bull"
+                  ? "row-bull"
+                  : passTreshold && streak.dir === "bear"
+                  ? "row-bear"
+                  : "row-neutral";
+
+              rows[i] = {
+                sym,
+                price: C,
+                funding,
+                fundingCountdown: fundingCountdown.text,
+                fundingHours: fundingCountdown.hours,
+                fundingMinutes: fundingCountdown.minutes,
+                fundingInterval,
+                streakCount: streak.count,
+                streakDir: streak.dir,
+                streakGain: streak.gain,
+                rsi,
+                atr,
+                volumeSpike,
+                O,
+                H,
+                L,
+                C,
+                match,
+                passTreshold,
+                rowClass,
+              };
+            } catch (e) {
+              rows[i] = { sym, error: e.message };
+            }
           }
         }
 
+        await Promise.all(Array.from({ length: workerCount }, () => worker()));
         renderRows(rows);
         fetching = false;
 
