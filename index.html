@@ -671,7 +671,7 @@
         statusDot.classList.remove("loading");
         statusText.textContent = "Updated";
         lastUpdated.textContent =
-          "Last updated: " + new Date().toLocaleTimeString();
+          "Last updated: " + new Date().toLocaleTimeString("en-US");
         countdown = parseInt(refreshSelect.value) || 0;
       }
 
@@ -749,7 +749,7 @@
 
       setInterval(() => {
         currentTimeEl.textContent =
-          "Current Time: " + new Date().toLocaleTimeString();
+          "Current Time: " + new Date().toLocaleTimeString("en-US");
       }, 1000);
 
       refreshButton.addEventListener("click", updateScreener);
