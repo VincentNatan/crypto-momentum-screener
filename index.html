@@ -93,7 +93,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 18px;
+        margin-bottom: 22px;
         gap: 12px;
         flex-wrap: wrap;
       }
@@ -433,7 +433,7 @@
         return r.result.list
       }
 
-      async function fetchTopSymbols(filter, refreshContent=true, limit=15) {
+      async function fetchTopSymbols(filter, limit=15) {
 
         let listData = await fetchTickerAll();
         topSymbolFilter = filter;
@@ -452,10 +452,9 @@
             listData.sort((a, b) => Number(b.fundingRate) - Number(a.fundingRate));
         }
 
-
         const top10Symbols = listData.slice(0, limit).map(item => item.symbol);
         document.getElementById("symbolsInput").value = top10Symbols.join(", ");
-        if (refreshContent) updateScreener();
+        updateScreener();
       }
 
       function msToCountdown(ms) {
@@ -639,9 +638,15 @@
           : { dir: "bear", ...bear };
       }
 
-      async function updateScreener() {
+      function countDownUpdateScreener(){
+        if (filterToggle.checked && topSymbolFilter) {
+          fetchTopSymbols(topSymbolFilter) 
+        } else {
+          updateScreener();
+        }
+      }
 
-        if (filterToggle.checked && topSymbolFilter) await fetchTopSymbols(topSymbolFilter, false);
+      async function updateScreener() {
 
         const symbols = symbolsInput.value
           .split(",")
@@ -814,7 +819,7 @@
 
         autoTimer = setInterval(() => {
           countdown--;
-          if (countdown <= 0) updateScreener();
+          if (countdown <= 0) countDownUpdateScreener();
           nextRefreshEl.textContent = `Next Refresh In: ${countdown}s`;
         }, 1000);
       }
