@@ -88,11 +88,66 @@
         transform: scale(0.96);
         box-shadow: 0 0 0 rgba(0, 0, 0, 0.3);
       }
-      /* Quick Action */
+      /* Quick Bar */
+      .quick-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .filter-toggle {
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        color: #9ca3af;
+        white-space: nowrap;
+        gap: 10px;
+      }
+
+      /* toggle switch */
+      .switch {
+        position: relative;
+        width: 42px;
+        height: 22px;
+      }
+
+      .switch input {
+        display: none;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        background-color: #374151;
+        border-radius: 999px;
+        top: 0; left: 0; right: 0; bottom: 0;
+        transition: 0.2s;
+      }
+
+      .slider:before {
+        content: "";
+        position: absolute;
+        height: 16px; width: 16px;
+        left: 3px; bottom: 3px;
+        background-color: white;
+        border-radius: 50%;
+        transition: 0.2s;
+      }
+
+      input:checked + .slider {
+        background-color: #2563eb;
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+
+      /* Quick Actions */
       .quick-actions {
         display: flex;
         gap: 10px;
-        margin-bottom: 18px;
         flex-wrap: wrap;
       }
       .quick-btn {
@@ -286,13 +341,24 @@
       </div>
 
       <!-- Quick Action -->
-      <div class="quick-actions">
-          <button onclick="fetchTopSymbols('Gainers')" class="quick-btn">Gainer</button>
-          <button onclick="fetchTopSymbols('Losers')" class="quick-btn">Losers</button>
-          <button onclick="fetchTopSymbols('Volume')" class="quick-btn">Volume</button>
-          <button onclick="fetchTopSymbols('turnOver')" class="quick-btn">Turn Over</button>
-          <button onclick="fetchTopSymbols('negative-funding')" class="quick-btn">Negative Funding</button>
-          <button onclick="fetchTopSymbols('positive-funding')" class="quick-btn">Positive Funding</button>
+      <div class="quick-bar">
+      
+        <div class="quick-actions">
+            <button onclick="fetchTopSymbols('Gainers')" class="quick-btn">Gainer</button>
+            <button onclick="fetchTopSymbols('Losers')" class="quick-btn">Losers</button>
+            <button onclick="fetchTopSymbols('Volume')" class="quick-btn">Volume</button>
+            <button onclick="fetchTopSymbols('turnOver')" class="quick-btn">Turn Over</button>
+            <button onclick="fetchTopSymbols('negative-funding')" class="quick-btn">Negative Funding</button>
+            <button onclick="fetchTopSymbols('positive-funding')" class="quick-btn">Positive Funding</button>
+        </div>
+
+        <div class="filter-toggle">
+          <span>Apply as filter</span>
+          <label class="switch">
+            <input type="checkbox" id="filterToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
       </div>
 
       <div class="status-row">
@@ -353,6 +419,8 @@
       const currentTimeEl = document.getElementById("currentTime");
       const nextRefreshEl = document.getElementById("nextRefresh");
       const ruleSelect = document.getElementById("ruleSelect");
+      const filterToggle = document.getElementById("filterToggle");
+      let topSymbolFilter = null;
 
       function fmt(n, d = 4) {
         const x = parseFloat(n);
@@ -365,28 +433,29 @@
         return r.result.list
       }
 
-      async function fetchTopSymbols(rule, limit=15) {
+      async function fetchTopSymbols(filter, refreshContent=true, limit=15) {
 
         let listData = await fetchTickerAll();
+        topSymbolFilter = filter;
 
-        if (rule === "Gainers") {
+        if (filter === "Gainers") {
             listData.sort((a, b) => Number(b.price24hPcnt) - Number(a.price24hPcnt));
-        } else if (rule === "Losers") {
+        } else if (filter === "Losers") {
             listData.sort((a, b) => Number(a.price24hPcnt) - Number(b.price24hPcnt));
-        } else if (rule === "Volume") {
+        } else if (filter === "Volume") {
             listData.sort((a, b) => Number(b.volume24h) - Number(a.volume24h));
-        } else if (rule === "turnOver") {
+        } else if (filter === "turnOver") {
             listData.sort((a, b) => Number(b.turnover24h) - Number(a.turnover24h));
-        }else if (rule === "negative-funding") {
+        }else if (filter === "negative-funding") {
             listData.sort((a, b) => Number(a.fundingRate) - Number(b.fundingRate));
-        }else if (rule === "positive-funding") {
+        }else if (filter === "positive-funding") {
             listData.sort((a, b) => Number(b.fundingRate) - Number(a.fundingRate));
         }
 
 
         const top10Symbols = listData.slice(0, limit).map(item => item.symbol);
         document.getElementById("symbolsInput").value = top10Symbols.join(", ");
-        updateScreener()
+        if (refreshContent) updateScreener();
       }
 
       function msToCountdown(ms) {
@@ -571,6 +640,9 @@
       }
 
       async function updateScreener() {
+
+        if (filterToggle.checked && topSymbolFilter) await fetchTopSymbols(topSymbolFilter, false);
+
         const symbols = symbolsInput.value
           .split(",")
           .map((x) => x.trim().toUpperCase())
