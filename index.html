@@ -429,7 +429,7 @@
       }
 
       async function fetchTickerAll() {
-        const r = await fetch(`${API_TICKER}?category=linear`).then((r) => r.json(), { cache: "no-store" });
+        const r = await fetch(`${API_TICKER}?category=linear`).then((r) => r.json());
         if (r.retCode !== 0) alert("Failed to fetch data");
         return r.result.list
       }
@@ -474,14 +474,6 @@
           hours: hoursNum,
           minutes: minutesNum,
         };
-      }
-
-      async function fetchFunding(symbol) {
-        const r = await fetch(
-          `${API_TICKER}?category=linear&symbol=${symbol}`
-        ).then((r) => r.json());
-        if (r.retCode !== 0) return null;
-        return r.result.list[0];
       }
 
       async function fetchOHLC(symbol, interval) {
