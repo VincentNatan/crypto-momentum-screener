@@ -54,6 +54,7 @@
       }
       .control-group.threshold {
         width: 120px;
+        display: none;
       }
       .control-group.refresh-btn {
         display: flex;
@@ -327,6 +328,11 @@
         </div>
 
         <div class="control-group">
+          <label>Size</label>
+          <input id="limitInput" type="number" value="15" min="1" max="100" />
+        </div>
+
+        <div class="control-group">
           <label>Auto Refresh</label>
           <select id="refreshSelect">
             <option value="0">None</option>
@@ -412,6 +418,7 @@
       const symbolsInput = document.getElementById("symbolsInput");
       const intervalSelect = document.getElementById("intervalSelect");
       const thresholdInput = document.getElementById("thresholdInput");
+      const limitInput = document.getElementById("limitInput");
       const refreshSelect = document.getElementById("refreshSelect");
       const refreshButton = document.getElementById("refreshButton");
       const resultsBody = document.getElementById("resultsBody");
@@ -435,7 +442,9 @@
         return r.result.list
       }
 
-      async function fetchTopSymbols(filter, limit=15) {
+      async function fetchTopSymbols(filter, limit=limitInput.value) {
+
+        console.log("limit:", limit)
 
         let listData = await fetchTickerAll();
         topSymbolFilter = filter;
@@ -827,6 +836,7 @@
       refreshSelect.addEventListener("change", startAutoRefresh);
       intervalSelect.addEventListener("change", updateScreener);
       thresholdInput.addEventListener("change", updateScreener);
+      limitInput.addEventListener("change", () => {fetchTopSymbols(topSymbolFilter, limitInput.value);});
       ruleSelect.addEventListener("change", updateScreener);
 
       updateScreener();
