@@ -705,7 +705,7 @@
               const match =
                 streak.count >= threshold &&
                 ((streak.dir === "bull" && funding < 0) ||
-                  (streak.dir === "bear" && funding > 0.005));
+                  (streak.dir === "bear" && funding > 0.005)) && Math.abs(streak.gain) > 2;
 
               const passTreshold = streak.count >= threshold;
 
