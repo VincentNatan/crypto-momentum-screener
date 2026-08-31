@@ -449,10 +449,6 @@
         const url = `${API_LONG_SHORT_RATIO}?category=linear&symbol=${symbol}&period=5min&limit=1`;
         const r = await fetch(url).then((res) => res.json());
 
-        if (r.retCode !== 0) {
-          throw new Error(`L/S ratio unavailable (${r.retMsg || r.retCode})`);
-        }
-
         const latest = r?.result?.list?.[0];
         if (!latest) return null;
 
