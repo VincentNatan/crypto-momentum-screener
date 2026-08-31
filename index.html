@@ -395,6 +395,7 @@
               <th>RSI</th>
               <th>Vol</th>
               <th>ATR</th>
+              <th>L/S</th>
               <th>OHLC</th>
               <th>Match?</th>
             </tr>
@@ -408,6 +409,7 @@
       const API_BASE = "https://api.bybit.com";
       const API_KLINE = API_BASE + "/v5/market/kline";
       const API_TICKER = API_BASE + "/v5/market/tickers";
+      const API_LONG_SHORT_RATIO = API_BASE + "/v5/market/account-ratio";
       const MAX_BARS = 22;
       const OHLC_CONCURRENCY = 5;
 
@@ -440,6 +442,28 @@
         const r = await fetch(`${API_TICKER}?category=linear`).then((r) => r.json());
         if (r.retCode !== 0) alert("Failed to fetch data");
         return r.result.list
+      }
+
+
+      async function fetchLongShortRatio(symbol, interval) {
+        const url = `${API_LONG_SHORT_RATIO}?category=linear&symbol=${symbol}&period=5min&limit=1`;
+        const r = await fetch(url).then((res) => res.json());
+
+        if (r.retCode !== 0) {
+          throw new Error(`L/S ratio unavailable (${r.retMsg || r.retCode})`);
+        }
+
+        const latest = r?.result?.list?.[0];
+        if (!latest) return null;
+
+        const buyRatio = parseFloat(latest.buyRatio);
+        const sellRatio = parseFloat(latest.sellRatio);
+
+        if (!isFinite(buyRatio) || !isFinite(sellRatio) || sellRatio === 0) {
+          return null;
+        }
+
+        return buyRatio / sellRatio;
       }
 
       async function fetchTopSymbols(filter, limit=limitInput.value) {
@@ -678,7 +702,10 @@
             const sym = symbols[i];
 
             try {
-              const candles = await fetchOHLC(sym, interval);
+              const [candles, longShortRatio] = await Promise.all([
+                fetchOHLC(sym, interval),
+                fetchLongShortRatio(sym, interval),
+              ]);
               const ticker = tickerMap.get(sym);
               if (!ticker) throw new Error("Ticker not found");
 
@@ -729,6 +756,7 @@
                 streakGain: streak.gain,
                 rsi,
                 atr,
+                longShortRatio,
                 volumeSpike,
                 O,
                 H,
@@ -785,6 +813,11 @@
 
             const atrClass = r.atr > 1 ? "" : "gain-neutral";
 
+            const longShortClass =
+              r.longShortRatio >= 1.3 || r.longShortRatio <= 0.7
+                ? "gain-warn"
+                : "gain-neutral";
+
             return `
             <tr class="${r.rowClass}">
               <td class="symbol">${r.sym}</td>
@@ -798,6 +831,7 @@
               <td class="${rsiClass}"> ${fmt(r.rsi, 2)}</td>
               <td class="${volumeSpikeClass}"> ${fmt(r.volumeSpike, 2)}</td>
               <td class="${atrClass}"> ${fmt(r.atr, 2) + "%"}</td>
+              <td class="${longShortClass}"> ${fmt(r.longShortRatio, 2)}</td>
               <td class="small-text">O:${fmt(r.O)} H:${fmt(r.H)} L:${fmt(r.L)} C:${fmt(r.C)}</td>
               <td><span class="badge ${r.match ? "yes" : "no"}">${
               r.match ? "YES" : "NO"
