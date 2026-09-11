@@ -727,8 +727,8 @@
 
               const match =
                 streak.count >= threshold &&
-                ((streak.dir === "bull" && funding < 0) ||
-                  (streak.dir === "bear" && funding > 0.005)) && Math.abs(streak.gain) > 2;
+                ((streak.dir === "bull" && funding > -0.04 && longShortRatio < 0.65) ||
+                  (streak.dir === "bear" && funding < 0.005 && longShortRatio > 1.5)) && Math.abs(streak.gain) > 3;
 
               const passTreshold = streak.count >= threshold;
 
