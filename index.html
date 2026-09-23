@@ -361,7 +361,7 @@
         </div>
 
         <div class="filter-toggle">
-          <span>Apply as filter</span>
+          <span>Freeze Symbol</span>
           <label class="switch">
             <input type="checkbox" id="filterToggle">
             <span class="slider"></span>
@@ -662,7 +662,7 @@
       }
 
       function countDownUpdateScreener(){
-        if (filterToggle.checked && topSymbolFilter) {
+        if (!filterToggle.checked && topSymbolFilter) {
           fetchTopSymbols(topSymbolFilter) 
         } else {
           updateScreener();
