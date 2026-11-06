@@ -726,8 +726,8 @@
               const streak = pickStreak(bull, bear);
 
               const match =
-                ((streak.gain >= 3.5 && funding <= 0.005 && funding >= -0.3 &&longShortRatio < 1) ||
-                  (streak.gain <= -3.5 && funding > 0.005 && longShortRatio > 1.5));
+                ((streak.gain >= 0.5 && funding <= 0.005 && funding >= -0.3 &&longShortRatio < 1) ||
+                  (streak.gain <= -0.5 && funding > 0.005 && longShortRatio > 1.5));
 
               const passTreshold = streak.count >= threshold;
 
