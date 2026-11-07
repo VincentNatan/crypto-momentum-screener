@@ -727,7 +727,7 @@
 
               const match =
                 ((streak.gain >= 0.5 && funding <= 0.005 && funding >= -0.3 &&longShortRatio < 1) ||
-                  (streak.gain <= -0.5 && funding > 0.005 && longShortRatio > 1.5));
+                  (streak.gain <= -0.5 && funding > 0.005 && longShortRatio > 1.5)) && longShortRatio > 0 ;
 
               const passTreshold = streak.count >= threshold;
 
@@ -809,7 +809,7 @@
             const atrClass = r.atr > 5 ? "" : "gain-neutral";
 
             const longShortClass =
-              r.longShortRatio >= 1.35 || r.longShortRatio <= 0.7
+              r.longShortRatio >= 1.35 || (r.longShortRatio <= 0.7 && r.longShortRatio > 0)
                 ? "gain-warn"
                 : "gain-neutral";
 
