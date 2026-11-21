@@ -235,10 +235,20 @@
       }
       .row-neutral {
         box-shadow: inset 3px 0 0 #4b5563;
+      }
+      .row-match {
+        background: rgba(20, 184, 166, 0.14);
+        box-shadow: inset 3px 0 0 #14b8a6;
+      }
+      .row-match:hover {
+        background: rgba(20, 184, 166, 0.24);
       } /* Hover */
       tbody tr:hover {
         background: rgba(151, 188, 247, 0.185);
         cursor: pointer;
+      }
+      tbody tr.row-match:hover {
+        background: rgba(20, 184, 166, 0.24);
       } /* Streak number color (matches row border) */
       .streak-bull {
         color: #22c55e;
@@ -397,7 +407,6 @@
               <th>ATR</th>
               <th>L/S</th>
               <th>OHLC</th>
-              <th>Match?</th>
             </tr>
           </thead>
           <tbody id="resultsBody"></tbody>
@@ -731,12 +740,13 @@
 
               const passTreshold = streak.count >= threshold;
 
-              const rowClass =
-                passTreshold && streak.dir === "bull"
-                  ? "row-bull"
-                  : passTreshold && streak.dir === "bear"
-                  ? "row-bear"
-                  : "row-neutral";
+              const rowClass = match
+                ? "row-match"
+                : passTreshold && streak.dir === "bull"
+                ? "row-bull"
+                : passTreshold && streak.dir === "bear"
+                ? "row-bear"
+                : "row-neutral";
 
               rows[i] = {
                 sym,
@@ -782,7 +792,7 @@
         resultsBody.innerHTML = rows
           .map((r) => {
             if (r.error) {
-              return `<tr class="row-neutral"><td>${r.sym}</td><td colspan="6" class="negative">${r.error}</td></tr>`;
+              return `<tr class="row-neutral"><td>${r.sym}</td><td colspan="10" class="negative">${r.error}</td></tr>`;
             }
 
             const streakClass = r.passTreshold
@@ -828,9 +838,6 @@
               <td class="${atrClass}"> ${fmt(r.atr, 2) + "%"}</td>
               <td class="${longShortClass}"> ${fmt(r.longShortRatio, 2)}</td>
               <td class="small-text">O:${fmt(r.O)} H:${fmt(r.H)} L:${fmt(r.L)} C:${fmt(r.C)}</td>
-              <td><span class="badge ${r.match ? "yes" : "no"}">${
-              r.match ? "YES" : "NO"
-            }</span></td>
             </tr>
           `;
           })
