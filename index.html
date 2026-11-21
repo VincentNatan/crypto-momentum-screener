@@ -407,6 +407,7 @@
               <th>ATR</th>
               <th>L/S</th>
               <th>OHLC</th>
+              <th>Match?</th>
             </tr>
           </thead>
           <tbody id="resultsBody"></tbody>
@@ -743,10 +744,10 @@
               const rowClass = match
                 ? "row-match"
                 : passTreshold && streak.dir === "bull"
-                ? "row-bull"
-                : passTreshold && streak.dir === "bear"
-                ? "row-bear"
-                : "row-neutral";
+                  ? "row-bull"
+                  : passTreshold && streak.dir === "bear"
+                  ? "row-bear"
+                  : "row-neutral";
 
               rows[i] = {
                 sym,
@@ -792,7 +793,7 @@
         resultsBody.innerHTML = rows
           .map((r) => {
             if (r.error) {
-              return `<tr class="row-neutral"><td>${r.sym}</td><td colspan="10" class="negative">${r.error}</td></tr>`;
+              return `<tr class="row-neutral"><td>${r.sym}</td><td colspan="11" class="negative">${r.error}</td></tr>`;
             }
 
             const streakClass = r.passTreshold
@@ -838,6 +839,9 @@
               <td class="${atrClass}"> ${fmt(r.atr, 2) + "%"}</td>
               <td class="${longShortClass}"> ${fmt(r.longShortRatio, 2)}</td>
               <td class="small-text">O:${fmt(r.O)} H:${fmt(r.H)} L:${fmt(r.L)} C:${fmt(r.C)}</td>
+              <td><span class="badge ${r.match ? "yes" : "no"}">${
+              r.match ? "YES" : "NO"
+            }</span></td>
             </tr>
           `;
           })
