@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Streak Screener (Bybit)</title>
+    <title>Terminal Screener - Bybit</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,7 +19,7 @@
         margin: 0;
         font-family: "Inter", system-ui, sans-serif;
         background: #050816;
-        color: #f5f5f5;
+        color: #dce6f5;
       }
       .wrapper {
         max-width: 1300px;
@@ -237,18 +237,15 @@
         box-shadow: inset 3px 0 0 #4b5563;
       }
       .row-match {
-        background: rgba(20, 184, 166, 0.16);
-        box-shadow: inset 3px 0 0 #14b8a6;
-      }
-      .row-match:hover {
-        background: rgba(20, 184, 166, 0.26);
+        background: rgba(37, 204, 255, 0.17);
+        box-shadow: inset 3px 0 0 #20cbff;
       } /* Hover */
       tbody tr:hover {
         background: rgba(151, 188, 247, 0.185);
         cursor: pointer;
       }
       tbody tr.row-match:hover {
-        background: rgba(20, 184, 166, 0.24);
+        background: rgba(37, 204, 255, 0.27);
       } /* Streak number color (matches row border) */
       .streak-bull {
         color: #22c55e;
@@ -291,7 +288,7 @@
 
   <body>
     <div class="wrapper">
-      <h1>Streak Screener (Bybit)</h1>
+      <h1>Terminal Screener - Bybit</h1>
       <div class="subtitle">
         Shows only <b>one streak</b> and <b>one gain</b> (bull OR bear). Row
         color reveals streak direction.
