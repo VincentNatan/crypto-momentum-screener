@@ -16,11 +16,11 @@
             --bg: #050816;
             --panel: #0b1120;
             --line: #1f2937;
-            --text: #dce6f5;
+            --text: #c5d0e0;
             --muted: #9ca3af;
-            --up: #22c55e;
-            --down: #ef4444;
-            --warn: #f8d560;
+            --up: #20b26c;
+            --down: #e5636e;
+            --warn: #e3c567;
             --accent: #2563eb;
             --match: #20cbff;
          }
@@ -263,6 +263,9 @@
          tbody tr.row-match td:first-child {
             box-shadow: inset 4px 0 0 var(--match);
          }
+         tbody tr.row-match:hover {
+            background: rgba(37, 204, 255, 0.26);
+         }
          tbody tr:hover {
             background: rgba(151, 188, 247, 0.15);
          }
@@ -279,8 +282,11 @@
             color: var(--muted);
          }
          .gain-warn {
-            color: #f8d560;
+            color: var(--warn)
          }
+         .gain-hit {
+             color: #dce6f5;
+          }
          .bold {
             font-weight: 600;
          }
@@ -291,13 +297,13 @@
             font-weight: 600;
          }
          .badge.yes {
-            background: rgba(34, 197, 94, 0.22);
-            color: #4ade80;
-         }
-         .badge.no {
-            background: rgba(239, 68, 68, 0.15);
-            color: #fb7185;
-         }
+             background: rgba(63, 182, 139, 0.18);
+             color: #5fcfa5;
+          }
+          .badge.no {
+             background: rgba(229, 99, 110, 0.16);
+             color: #ee8a92;
+          }
          .interval-chip {
             font-size: 11px;
             padding: 1px 6px;
@@ -1032,12 +1038,13 @@
                         : r.streakDir === "bear"
                           ? "▼"
                           : "–";
-                  const streakClass =
-                     r.streakDir === "bull"
-                        ? "streak-bull"
-                        : r.streakDir === "bear"
-                          ? "streak-bear"
-                          : "streak-neutral";
+                  const streakClass = !r.passTreshold
+                    ? "streak-neutral"
+                    : r.streakDir === "bull"
+                      ? "streak-bull"
+                      : r.streakDir === "bear"
+                        ? "streak-bear"
+                        : "streak-neutral";
 
                   const fundingClass =
                      r.funding > 0
@@ -1046,12 +1053,12 @@
                           ? "gain-bear"
                           : "gain-neutral";
                   const fundingCountdownClass =
-                     r.fundingCountdownMs < 6 * 60 * 1000 ? "" : "gain-neutral";
+                     r.fundingCountdownMs < 6 * 60 * 1000 ? "gain-hit" : "gain-neutral";
                   const rsiClass =
                      r.rsi >= 70 || r.rsi <= 30 ? "gain-warn" : "gain-neutral";
                   const volumeSpikeClass =
-                     r.volumeSpike >= 2 ? "" : "gain-neutral";
-                  const atrClass = r.atr > 5 ? "" : "gain-neutral";
+                     r.volumeSpike >= 2 ? "gain-hit" : "gain-neutral";
+                  const atrClass = r.atr > 5 ? "gain-hit" : "gain-neutral";
                   const longShortClass =
                      r.longShortRatio >= 1.35 ||
                      (r.longShortRatio <= 0.7 && r.longShortRatio > 0)
@@ -1071,9 +1078,9 @@
                   return `
       <tr class="${rowClass}">
         <td class="symbol">${escapeHtml(r.sym)}</td>
-        <td class="numeric bold">${formatPrice(r.price)}</td>
+        <td class="numeric">${formatPrice(r.price)}</td>
         <td class="numeric ${gainClass}">${r.streakCount > 0 ? formatText(r.streakGain, 2) + "%" : "-"}</td>
-        <td class="numeric ${streakClass} ${r.passTreshold ? "bold" : ""}">${streakArrow}${r.streakCount > 1 ? " " + r.streakCount : ""}</td>
+        <td class="numeric ${streakClass}">${streakArrow}${r.streakCount > 1 ? " " + r.streakCount : ""}</td>
         <td class="numeric ${fundingClass}">${formatText(r.funding, 4)}%</td>
         <td class="numeric ${fundingCountdownClass}">${msToCountdown(r.fundingCountdownMs)}<span class="interval-chip">${r.fundingInterval}h</span></td>
         <td class="numeric ${rsiClass}">${formatText(r.rsi, 2)}</td>
