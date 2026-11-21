@@ -1,895 +1,1176 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Terminal Screener - Bybit</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        font-family: "Inter", system-ui, sans-serif;
-        background: #050816;
-        color: #dce6f5;
-      }
-      .wrapper {
-        max-width: 1300px;
-        margin: auto;
-        padding: 30px 16px 40px;
-      }
-      h1 {
-        margin: 0 0 6px;
-        font-size: 30px;
-        font-weight: 600;
-      }
-      .subtitle {
-        margin-bottom: 18px;
-        font-size: 13px;
-        color: #9ca3af;
-      } /* Controls */
-      .controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        background: radial-gradient(circle at top left, #111827, #020617);
-        padding: 12px;
-        border-radius: 12px;
-        border: 1px solid #1f2937;
-        margin-bottom: 10px;
-      }
-      .control-group {
-        display: flex;
-        flex-direction: column;
-        min-width: 100px;
-        gap: 4px;
-      }
-      .control-group.threshold {
-        width: 120px;
-        display: none;
-      }
-      .control-group.refresh-btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      label {
-        font-size: 13px;
-        color: #9ca3af;
-      }
-      input,
-      select {
-        padding: 12px 14px;
-        border-radius: 12px;
-        border: 1px solid #374151;
-        background: #020617;
-        color: #fff;
-        font-size: 14px;
-      }
-      .btn {
-        padding: 12px 22px;
-        border-radius: 99px;
-        background: linear-gradient(135deg, #2563eb, #4f46e5);
-        border: none;
-        color: white;
-        cursor: pointer;
-        font-size: 15px;
-        font-weight: 500;
-        transition: transform 0.1s ease, box-shadow 0.15s ease;
-      }
-      .btn:active {
-        transform: scale(0.96);
-        box-shadow: 0 0 0 rgba(0, 0, 0, 0.3);
-      }
-      /* Quick Bar */
-      .quick-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 22px;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-      .filter-toggle {
-        display: flex;
-        align-items: center;
-        font-size: 13px;
-        color: #9ca3af;
-        white-space: nowrap;
-        gap: 10px;
-      }
+   <head>
+      <meta charset="UTF-8" />
+      <title>Terminal Screener</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap"
+         rel="stylesheet"
+      />
+      <style>
+         :root {
+            --bg: #050816;
+            --panel: #0b1120;
+            --line: #1f2937;
+            --text: #dce6f5;
+            --muted: #9ca3af;
+            --up: #22c55e;
+            --down: #ef4444;
+            --warn: #f8d560;
+            --accent: #2563eb;
+            --match: #20cbff;
+         }
+         * {
+            box-sizing: border-box;
+         }
+         body {
+            margin: 0;
+            font-family: "Inter", system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+         }
+         .wrapper {
+            max-width: 1400px;
+            margin: auto;
+            padding: 30px 16px 40px;
+         }
+         h1 {
+            margin: 0 0 6px;
+            font-size: 30px;
+            font-weight: 600;
+         }
+         .subtitle {
+            margin-bottom: 18px;
+            font-size: 13px;
+            color: var(--muted);
+         }
+         label {
+            font-size: 13px;
+            color: var(--muted);
+         }
+         input,
+         select {
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #374151;
+            background: #020617;
+            color: #fff;
+            font-size: 14px;
+         }
+         :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+         }
 
-      /* toggle switch */
-      .switch {
-        position: relative;
-        width: 42px;
-        height: 22px;
-      }
+         .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+            background: radial-gradient(circle at top left, #111827, #020617);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            margin-bottom: 10px;
+         }
+         .control-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 100px;
+            gap: 4px;
+         }
+         .control-group.threshold {
+            display: none;
+         }
+         .btn {
+            padding: 12px 22px;
+            border-radius: 99px;
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: transform 0.1s;
+         }
+         .btn:active {
+            transform: scale(0.96);
+         }
 
-      .switch input {
-        display: none;
-      }
+         .quick-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            gap: 12px;
+            flex-wrap: wrap;
+         }
+         .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+         }
+         .quick-btn {
+            padding: 8px 14px;
+            border-radius: 25px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            color: #e5e7eb;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+         }
+         .quick-btn:hover {
+            background: #111827;
+            border-color: #2563eb;
+            color: #93c5fd;
+         }
+         .quick-btn:active {
+            transform: scale(0.96);
+         }
+         .quick-btn:focus {
+            background: rgba(37, 99, 235, 0.15);
+            border-color: #2563eb;
+            color: #bfdbfe;
+         }
+         .filter-toggle {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: var(--muted);
+            gap: 8px;
+            flex-wrap: wrap;
+         }
+         .filter-toggle .spacer {
+            width: 10px;
+         }
+         .switch {
+            position: relative;
+            width: 42px;
+            height: 22px;
+            display: inline-block;
+         }
+         .switch input {
+            display: none;
+         }
+         .slider {
+            position: absolute;
+            cursor: pointer;
+            background: #374151;
+            border-radius: 999px;
+            inset: 0;
+            transition: 0.2s;
+         }
+         .slider:before {
+            content: "";
+            position: absolute;
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.2s;
+         }
+         input:checked + .slider {
+            background: var(--accent);
+         }
+         input:checked + .slider:before {
+            transform: translateX(20px);
+         }
 
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        background-color: #374151;
-        border-radius: 999px;
-        top: 0; left: 0; right: 0; bottom: 0;
-        transition: 0.2s;
-      }
+         .status-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--muted);
+         }
+         .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--up);
+            display: inline-block;
+            margin-right: 6px;
+         }
+         .dot.loading {
+            background: #facc15;
+         }
+         .dot.error {
+            background: var(--down);
+         }
 
-      .slider:before {
-        content: "";
-        position: absolute;
-        height: 16px; width: 16px;
-        left: 3px; bottom: 3px;
-        background-color: white;
-        border-radius: 50%;
-        transition: 0.2s;
-      }
+         .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            background: #020617;
+         }
+         table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+         }
+         th {
+            background: #030712;
+            padding: 9px 10px;
+            color: var(--muted);
+            border-bottom: 1px solid #111827;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+         }
+         th:hover {
+            color: var(--text);
+         }
+         th.numeric,
+         td.numeric {
+            font-variant-numeric: tabular-nums;
+         }
+         th .sort-arrow {
+            display: inline-block;
+            width: 10px;
+            color: var(--accent);
+         }
+         td {
+            padding: 9px 10px;
+            white-space: nowrap;
+         }
+         td.symbol {
+            font-weight: 600;
+         }
+         tbody tr.row-bull td:first-child {
+            box-shadow: inset 3px 0 0 var(--up);
+         }
+         tbody tr.row-bear td:first-child {
+            box-shadow: inset 3px 0 0 var(--down);
+         }
+         tbody tr.row-neutral td:first-child {
+            box-shadow: inset 3px 0 0 #4b5563;
+         }
+         tbody tr.row-match {
+            background: rgba(37, 204, 255, 0.16);
+         }
+         tbody tr.row-match td:first-child {
+            box-shadow: inset 4px 0 0 var(--match);
+         }
+         tbody tr:hover {
+            background: rgba(151, 188, 247, 0.15);
+         }
+         .streak-bull,
+         .gain-bull {
+            color: var(--up);
+         }
+         .streak-bear,
+         .gain-bear {
+            color: var(--down);
+         }
+         .streak-neutral,
+         .gain-neutral {
+            color: var(--muted);
+         }
+         .gain-warn {
+            color: #f8d560;
+         }
+         .bold {
+            font-weight: 600;
+         }
+         .badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+         }
+         .badge.yes {
+            background: rgba(34, 197, 94, 0.22);
+            color: #4ade80;
+         }
+         .badge.no {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fb7185;
+         }
+         .interval-chip {
+            font-size: 11px;
+            padding: 1px 6px;
+            border-radius: 6px;
+            background: #111827;
+            color: var(--muted);
+            margin-left: 6px;
+         }
+         .range-bar {
+            position: relative;
+            display: inline-block;
+            width: 120px;
+            height: 6px;
+            border-radius: 3px;
+            background: #1f2937;
+            vertical-align: middle;
+         }
+         .range-close {
+            position: absolute;
+            top: -3px;
+            width: 4px;
+            height: 12px;
+            border-radius: 2px;
+            background: var(--muted);
+         }
+         .range-open {
+            position: absolute;
+            top: -1px;
+            width: 1px;
+            height: 8px;
+            background: #e5e7eb;
+            opacity: 0.75;
+         }
+         .range-bar.bull .range-close {
+            background: var(--up);
+         }
+         .range-bar.bear .range-close {
+            background: var(--down);
+         }
+         .error-text {
+            color: var(--down);
+         }
+         .empty-row {
+            padding: 30px;
+            text-align: center;
+            color: var(--muted);
+         }
+      </style>
+   </head>
+   <body>
+      <div class="wrapper">
+         <h1>Terminal Screener - Bybit</h1>
+         <div class="subtitle">
+            A terminal-style screener for Bybit perpetuals: streaks, funding, RSI, ATR and long/short ratio in one live table.
+         </div>
 
-      input:checked + .slider {
-        background-color: #2563eb;
-      }
+         <div class="controls">
+            <div class="control-group" style="flex: 1 1 260px">
+               <label for="symbolsInput">Symbols</label>
+               <input
+                  id="symbolsInput"
+                  value="BTCUSDT, ETHUSDT, SOLUSDT, DOGEUSDT"
+               />
+            </div>
+            <div class="control-group">
+               <label for="ruleSelect">Streak Rule</label>
+               <select id="ruleSelect">
+                  <option value="weak">Weak</option>
+                  <option value="strong">Strong</option>
+                  <option value="engulfing">Engulfing</option>
+                  <option value="candle" selected>Candle</option>
+               </select>
+            </div>
+            <div class="control-group">
+               <label for="intervalSelect">Interval</label>
+               <select id="intervalSelect">
+                  <option value="1">1m</option>
+                  <option value="3">3m</option>
+                  <option value="5">5m</option>
+                  <option value="15">15m</option>
+                  <option value="30">30m</option>
+                  <option value="60">1h</option>
+                  <option value="240">4h</option>
+                  <option value="D" selected>1D</option>
+               </select>
+            </div>
+            <div class="control-group threshold">
+               <label for="thresholdInput">Streak Threshold</label>
+               <input
+                  id="thresholdInput"
+                  type="number"
+                  value="3"
+                  min="1"
+                  max="14"
+               />
+            </div>
+            <div class="control-group">
+               <label for="limitInput">Size</label>
+               <input
+                  id="limitInput"
+                  type="number"
+                  value="15"
+                  min="1"
+                  max="100"
+               />
+            </div>
+            <div class="control-group">
+               <label for="refreshSelect">Auto Refresh</label>
+               <select id="refreshSelect">
+                  <option value="0">None</option>
+                  <option value="5">5s</option>
+                  <option value="10" selected>10s</option>
+                  <option value="30">30s</option>
+                  <option value="60">1m</option>
+               </select>
+            </div>
+            <button id="refreshButton" class="btn" title="Refresh (R)">
+               Refresh
+            </button>
+         </div>
 
-      input:checked + .slider:before {
-        transform: translateX(20px);
-      }
+         <div class="quick-bar">
+            <div class="quick-actions" id="quickActions">
+               <button class="quick-btn" data-filter="Gainers">Gainer</button>
+               <button class="quick-btn" data-filter="Losers">Losers</button>
+               <button class="quick-btn" data-filter="Volume">Volume</button>
+               <button class="quick-btn" data-filter="turnOver">
+                  Turn Over
+               </button>
+               <button class="quick-btn" data-filter="negative-funding">
+                  Negative Funding
+               </button>
+               <button class="quick-btn" data-filter="positive-funding">
+                  Positive Funding
+               </button>
+            </div>
+            <div class="filter-toggle">
+               <span title="Highlight rows that match the screening rules"
+                  >Match Highlight</span
+               >
+               <label class="switch"
+                  ><input
+                     type="checkbox"
+                     id="highlightSymbolToggle"
+                     checked /><span class="slider"></span
+               ></label>
+               <span class="spacer"></span>
+               <span
+                  title="Keep the current symbol list when auto-refreshing a Gainer/Volume/etc. filter"
+                  >Freeze Symbol</span
+               >
+               <label class="switch"
+                  ><input type="checkbox" id="freezeSymbolToggle" /><span
+                     class="slider"
+                  ></span
+               ></label>
+            </div>
+         </div>
 
-      /* Quick Actions */
-      .quick-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-      .quick-btn {
-        padding: 8px 14px;
-        border-radius: 25px;
-        background: #0b1120;
-        border: 1px solid #1f2937;
-        color: #e5e7eb;
-        font-size: 13px;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        white-space: nowrap;
-      }
-      .quick-btn:hover {
-        background: #111827;
-        border-color: #2563eb;
-        color: #93c5fd;
-      }
-      .quick-btn:active {
-        transform: scale(0.96);
-      }
-      .quick-btn:focus {
-        background: rgba(37, 99, 235, 0.15);
-        border-color: #2563eb;
-        color: #bfdbfe;
-      }
+         <div class="status-row">
+            <span
+               ><span id="statusDot" class="dot"></span
+               ><span id="statusText">Idle</span></span
+            >
+            <span id="lastUpdated">Last updated: -</span>
+         </div>
+         <div class="status-row">
+            <span id="currentTime">Current Time: -</span>
+            <span id="nextRefresh">Next Refresh In: -</span>
+         </div>
 
-      /* Status */
-      .status-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 6px;
-        font-size: 13px;
-        color: #9ca3af;
-      }
-      .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #22c55e;
-        display: inline-block;
-      }
-      .dot.loading {
-        background: #facc15;
-      }
-      .dot.error {
-        background: #ef4444;
-      } /* Table */
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-        border: 1px solid #1f2937;
-        background: #020617;
-        border-radius: 12px;
-        overflow: hidden;
-      }
-      .table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-      thead {
-        background: #030712;
-      }
-      th {
-        padding: 8px 10px;
-        color: #9ca3af;
-        border-bottom: 1px solid #111827;
-        text-align: left;
-      }
-      td {
-        padding: 8px 10px;
-        white-space: nowrap;
-      }
-      td.small-text {
-        font-size: 11px;
-        color: #9ca3af;
-      } /* Row borders */
-      .row-bull {
-        box-shadow: inset 3px 0 0 #22c55e;
-      }
-      .row-bear {
-        box-shadow: inset 3px 0 0 #ef4444;
-      }
-      .row-neutral {
-        box-shadow: inset 3px 0 0 #4b5563;
-      }
-      .row-match {
-        background: rgba(37, 204, 255, 0.17);
-        box-shadow: inset 3px 0 0 #20cbff;
-      } /* Hover */
-      tbody tr:hover {
-        background: rgba(151, 188, 247, 0.185);
-        cursor: pointer;
-      }
-      tbody tr.row-match:hover {
-        background: rgba(37, 204, 255, 0.27);
-      } /* Streak number color (matches row border) */
-      .streak-bull {
-        color: #22c55e;
-        font-weight: 600;
-      }
-      .streak-bear {
-        color: #ef4444;
-        font-weight: 600;
-      }
-      .streak-neutral {
-        color: #9ca3af;
-      } /* Gain color */
-      .gain-bull {
-        color: #22c55e;
-      }
-      .gain-bear {
-        color: #ef4444;
-      }
-      .gain-warn {
-        color: #f8d560;
-      }
-      .gain-neutral {
-        color: #9ca3af;
-      } /* Badge */
-      .badge {
-        padding: 2px 6px;
-        border-radius: 999px;
-        font-size: 12px;
-      }
-      .badge.yes {
-        background: rgba(22, 163, 74, 0.2);
-        color: #4ade80;
-      }
-      .badge.no {
-        background: rgba(239, 68, 68, 0.2);
-        color: #fb7185;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="wrapper">
-      <h1>Terminal Screener - Bybit</h1>
-      <div class="subtitle">
-        Shows only <b>one streak</b> and <b>one gain</b> (bull OR bear). Row
-        color reveals streak direction.
+         <div class="table-wrapper">
+            <table>
+               <thead>
+                  <tr id="tableHeadRow"></tr>
+               </thead>
+               <tbody id="resultsBody">
+                  <tr>
+                     <td class="empty-row" colspan="12">Loading…</td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
       </div>
 
-      <!-- Controls -->
-      <div class="controls">
-        <div class="control-group" style="flex: 1 1 260px">
-          <label>Symbols</label>
-          <input
-            id="symbolsInput"
-            value="BTCUSDT, ETHUSDT, SOLUSDT, DOGEUSDT"
-            name="symbolsInput"
-          />
-        </div>
-
-        <div class="control-group">
-          <label>Streak Rule</label>
-          <select id="ruleSelect">
-            <option value="weak">Weak</option>
-            <option value="strong">Strong</option>
-            <option value="engulfing">Engulfing</option>
-            <option value="candle" selected>Candle</option>
-          </select>
-        </div>
-
-        <div class="control-group">
-          <label>Interval</label>
-          <select id="intervalSelect">
-            <option value="1">1m</option>
-            <option value="3">3m</option>
-            <option value="5">5m</option>
-            <option value="15">15m</option>
-            <option value="30">30m</option>
-            <option value="60">1h</option>
-            <option value="240">4h</option>
-            <option value="D" selected>1D</option>
-          </select>
-        </div>
-
-        <div class="control-group threshold">
-          <label>Streak Threshold</label>
-          <input id="thresholdInput" type="number" value="3" min="1" max="14" />
-        </div>
-
-        <div class="control-group">
-          <label>Size</label>
-          <input id="limitInput" type="number" value="15" min="1" max="100" />
-        </div>
-
-        <div class="control-group">
-          <label>Auto Refresh</label>
-          <select id="refreshSelect">
-            <option value="0">None</option>
-            <option value="5">5s</option>
-            <option value="10" selected>10s</option>
-            <option value="30">30s</option>
-            <option value="60">1m</option>
-          </select>
-        </div>
-
-        <div class="control-group refresh-btn">
-          <button id="refreshButton" class="btn">Refresh</button>
-        </div>
-      </div>
-
-      <!-- Quick Action -->
-      <div class="quick-bar">
-      
-        <div class="quick-actions">
-            <button onclick="fetchTopSymbols('Gainers')" class="quick-btn">Gainer</button>
-            <button onclick="fetchTopSymbols('Losers')" class="quick-btn">Losers</button>
-            <button onclick="fetchTopSymbols('Volume')" class="quick-btn">Volume</button>
-            <button onclick="fetchTopSymbols('turnOver')" class="quick-btn">Turn Over</button>
-            <button onclick="fetchTopSymbols('negative-funding')" class="quick-btn">Negative Funding</button>
-            <button onclick="fetchTopSymbols('positive-funding')" class="quick-btn">Positive Funding</button>
-        </div>
-          
-
-        <div class="filter-toggle">
-
-          <span>Match Highlight</span>
-            <label class="switch">
-              <input type="checkbox" id="highlightSymbolToggle">
-              <span class="slider"></span>
-            </label>
-  
-          <span>Freeze Symbol</span>
-          <label class="switch">
-            <input type="checkbox" id="freezeSymbolToggle">
-            <span class="slider"></span>
-          </label>
-
-        </div>
-
-      </div>
-
-      <div class="status-row">
-        <span
-          ><span id="statusDot" class="dot"></span>
-          <span id="statusText">Idle</span></span
-        >
-        <span id="lastUpdated">Last updated: -</span>
-      </div>
-
-      <div class="status-row">
-        <span id="currentTime">Current Time: -</span>
-        <span id="nextRefresh">Next Refresh In: -</span>
-      </div>
-
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Symbol</th>
-              <th>Price</th>
-              <th>Gain %</th>
-              <th>Streak</th>
-              <th>Funding</th>
-              <th>Next Funding</th>
-              <th>RSI</th>
-              <th>Vol</th>
-              <th>ATR</th>
-              <th>L/S</th>
-              <th>OHLC</th>
-              <th>Match?</th>
-            </tr>
-          </thead>
-          <tbody id="resultsBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <script>
-      const API_BASE = "https://api.bybit.com";
-      const API_KLINE = API_BASE + "/v5/market/kline";
-      const API_TICKER = API_BASE + "/v5/market/tickers";
-      const API_LONG_SHORT_RATIO = API_BASE + "/v5/market/account-ratio";
-      const MAX_BARS = 22;
-      const OHLC_CONCURRENCY = 5;
-
-      let autoTimer = null;
-      let countdown = 10;
-      let fetching = false;
-
-      const symbolsInput = document.getElementById("symbolsInput");
-      const intervalSelect = document.getElementById("intervalSelect");
-      const thresholdInput = document.getElementById("thresholdInput");
-      const limitInput = document.getElementById("limitInput");
-      const refreshSelect = document.getElementById("refreshSelect");
-      const refreshButton = document.getElementById("refreshButton");
-      const resultsBody = document.getElementById("resultsBody");
-      const statusDot = document.getElementById("statusDot");
-      const statusText = document.getElementById("statusText");
-      const lastUpdated = document.getElementById("lastUpdated");
-      const currentTimeEl = document.getElementById("currentTime");
-      const nextRefreshEl = document.getElementById("nextRefresh");
-      const ruleSelect = document.getElementById("ruleSelect");
-      const freezeSymbolToggle = document.getElementById("freezeSymbolToggle");
-      const highlightSymbolToggle = document.getElementById("highlightSymbolToggle");
-      let topSymbolFilter = null;
-
-      function fmt(n, d = 4) {
-        const x = parseFloat(n);
-        return isNaN(x) ? "-" : x.toFixed(d);
-      }
-
-      async function fetchTickerAll() {
-        const r = await fetch(`${API_TICKER}?category=linear`).then((r) => r.json());
-        if (r.retCode !== 0) alert("Failed to fetch data");
-        return r.result.list
-      }
-
-
-      async function fetchLongShortRatio(symbol, interval) {
-        const url = `${API_LONG_SHORT_RATIO}?category=linear&symbol=${symbol}&period=5min&limit=1`;
-        const r = await fetch(url).then((res) => res.json());
-
-        const latest = r?.result?.list?.[0];
-        if (!latest) return null;
-
-        const buyRatio = parseFloat(latest.buyRatio);
-        const sellRatio = parseFloat(latest.sellRatio);
-
-        if (!isFinite(buyRatio) || !isFinite(sellRatio) || sellRatio === 0) {
-          return null;
-        }
-
-        return buyRatio / sellRatio;
-      }
-
-      async function fetchTopSymbols(filter, limit=limitInput.value) {
-
-        console.log("limit:", limit)
-
-        let listData = await fetchTickerAll();
-        topSymbolFilter = filter;
-
-        if (filter === "Gainers") {
-            listData.sort((a, b) => Number(b.price24hPcnt) - Number(a.price24hPcnt));
-        } else if (filter === "Losers") {
-            listData.sort((a, b) => Number(a.price24hPcnt) - Number(b.price24hPcnt));
-        } else if (filter === "Volume") {
-            listData.sort((a, b) => Number(b.volume24h) - Number(a.volume24h));
-        } else if (filter === "turnOver") {
-            listData.sort((a, b) => Number(b.turnover24h) - Number(a.turnover24h));
-        }else if (filter === "negative-funding") {
-            listData.sort((a, b) => Number(a.fundingRate) - Number(b.fundingRate));
-        }else if (filter === "positive-funding") {
-            listData.sort((a, b) => Number(b.fundingRate) - Number(a.fundingRate));
-        }
-
-        const top10Symbols = listData.slice(0, limit).map(item => item.symbol);
-        document.getElementById("symbolsInput").value = top10Symbols.join(", ");
-        updateScreener();
-      }
-
-      function msToCountdown(ms) {
-        const totalSeconds = Math.floor(ms / 1000);
-
-        const hoursNum = Math.floor(totalSeconds / 3600);
-        const minutesNum = Math.floor((totalSeconds % 3600) / 60);
-        const secondsNum = totalSeconds % 60;
-
-        const hours = String(hoursNum).padStart(2, "0");
-        const minutes = String(minutesNum).padStart(2, "0");
-        const seconds = String(secondsNum).padStart(2, "0");
-
-        return {
-          text: `${hours} : ${minutes} : ${seconds}`,
-          hours: hoursNum,
-          minutes: minutesNum,
-        };
-      }
-
-      async function fetchOHLC(symbol, interval) {
-        const r = await fetch(
-          `${API_KLINE}?category=linear&symbol=${symbol}&interval=${interval}&limit=${
-            MAX_BARS + 1
-          }`
-        ).then((r) => r.json());
-        if (r.retCode !== 0) throw new Error(r.retMsg);
-        return r.result.list;
-      }
-
-      function calcStreak(candles, type, rule) {
-        let count = 0;
-
-        for (let i = 0; i < MAX_BARS; i++) {
-          const cur = candles[i],
-            prev = candles[i + 1];
-          if (!cur || !prev) break;
-          
-          const open = parseFloat(cur[1]);
-          const close = parseFloat(cur[4]);
-          const prevClose = parseFloat(prev[4]);
-          const prevOpen = parseFloat(prev[1]);
-
-          const curGreen = close > open 
-          const curRed = close < open
-          const prevGreen = prevClose > prevOpen
-          const prevRed = prevClose < prevOpen
-
-          let condition;
-
-          if (rule === "engulfing"){
-            // engulfing rule: candle engulfing
-            condition = type === "bull" ? (prevRed && curGreen && (close > prevOpen)) : (prevGreen && curRed && (close < prevOpen ));
-          } else if (rule === "strong") {
-            // strong rule: close > prev close
-            condition = type === "bull" ? (prevGreen && curGreen) : (prevRed && curRed);
-          } else if (rule === "weak") {
-            // weak rule: close > prev open
-            condition = type === "bull" ? close >= prevOpen : close <= prevOpen;
-          } else if (rule === "candle") {
-            // default rule: candle
-            condition = i == 1 
-          }
-
-          if (condition) count++;
-          else break;
-        }
-
-        let gain = 0;
-        if (count >= 0) {
-          const lastClose = parseFloat(candles[0][4]);
-          const startOpen = parseFloat(candles[count][1]);
-          gain = ((lastClose - startOpen) / startOpen) * 100;
-        }
-
-        if (rule === "candle") count = 1
-
-        return { count, gain };
-      }
-      function computeRSI(candles, length = 14) {
-        // Need at least length + 1 candles
-        if (candles.length < length + 1) return null;
-
-        let gains = 0;
-        let losses = 0;
-
-        // Calculate average gain/loss over the first period
-        for (let i = 0; i < length; i++) {
-          const closeNow = parseFloat(candles[i][4]);
-          const closePrev = parseFloat(candles[i + 1][4]);
-          const diff = closeNow - closePrev;
-
-          if (diff > 0) gains += diff;
-          else losses -= diff; // diff is negative
-        }
-
-        let avgGain = gains / length;
-        let avgLoss = losses / length;
-
-        // Wilder smoothing — continue with remaining candles
-        for (let i = length; i < candles.length - 1; i++) {
-          const closeNow = parseFloat(candles[i][4]);
-          const closePrev = parseFloat(candles[i + 1][4]);
-          const diff = closeNow - closePrev;
-
-          let gain = diff > 0 ? diff : 0;
-          let loss = diff < 0 ? -diff : 0;
-
-          avgGain = (avgGain * (length - 1) + gain) / length;
-          avgLoss = (avgLoss * (length - 1) + loss) / length;
-        }
-
-        if (avgLoss === 0) return 100; // cannot divide by zero → RSI max
-
-        const rs = avgGain / avgLoss;
-        const rsiVal = 100 - 100 / (1 + rs);
-
-        return rsiVal;
-      }
-
-      function calculateATR(candles, length = 14) {
-        if (!candles || candles.length < length + 1) return null;
-
-        let trSum = 0;
-
-        // We need `length` true ranges
-        for (let i = 0; i < length; i++) {
-          const curr = candles[i];
-          const prev = candles[i + 1];
-        
-          const high = parseFloat(curr[2]);
-          const low = parseFloat(curr[3]);
-          const prevClose = parseFloat(prev[4]);
-        
-          const tr = Math.max(
-            high - low,
-            Math.abs(high - prevClose),
-            Math.abs(low - prevClose)
-          );
-        
-          trSum += tr;
-        }
-      
-        return trSum / length;
-      }
-
-      function calculateATRPercent(candles, length = 14) {
-        const atr = calculateATR(candles, length);
-        const close = parseFloat(candles[0][4]);
-        return (atr / close) * 100;
-      }
-
-
-      function countVolumeSpikes(candles,length = 8){
-        const currentVolume = parseFloat(candles[0][5]);
-
-        let sumVolume = 0;
-        for (let i = 1; i <= length; i++) {
-          sumVolume += parseFloat(candles[i][5]);
-        }
-        const avgVolume = sumVolume / length;
-        const volumeSpikeRatio = currentVolume / avgVolume;
-        return volumeSpikeRatio;
-      }
-
-      function pickStreak(bull, bear) {
-        if (bull.count > 0 && bear.count === 0) return { dir: "bull", ...bull };
-        if (bear.count > 0 && bull.count === 0) return { dir: "bear", ...bear };
-        if (bull.count === 0 && bear.count === 0)
-          return { dir: "none", ...bull };
-        return bull.count >= bear.count
-          ? { dir: "bull", ...bull }
-          : { dir: "bear", ...bear };
-      }
-
-      function countDownUpdateScreener(){
-        if (!freezeSymbolToggle.checked && topSymbolFilter) {
-          fetchTopSymbols(topSymbolFilter) 
-        } else {
-          updateScreener();
-        }
-      }
-
-      async function updateScreener() {
-
-        const symbols = symbolsInput.value
-          .split(",")
-          .map((x) => x.trim().toUpperCase())
-          .filter(Boolean);
-        const interval = intervalSelect.value;
-        const threshold = parseInt(thresholdInput.value) || 3;
-        const rule = document.getElementById("ruleSelect").value;
-
-        if (fetching) return;
-        fetching = true;
-
-        statusDot.classList.add("loading");
-        statusText.textContent = "Loading...";
-
-        const rows = new Array(symbols.length);
-        const tickerList = await fetchTickerAll();
-        const tickerMap = new Map(tickerList.map((t) => [t.symbol, t]));
-        let cursor = 0;
-        const workerCount = Math.min(OHLC_CONCURRENCY, symbols.length);
-
-        async function worker() {
-          while (true) {
-            const i = cursor++;
-            if (i >= symbols.length) break;
-            const sym = symbols[i];
+      <script>
+         const API_BASE = "https://api.bybit.com";
+         const API_KLINE = API_BASE + "/v5/market/kline";
+         const API_TICKER = API_BASE + "/v5/market/tickers";
+         const API_LONG_SHORT_RATIO = API_BASE + "/v5/market/account-ratio";
+         const MAX_BARS = 22;
+         const OHLC_CONCURRENCY = 5;
+
+         let autoTimer = null;
+         let countdown = 10;
+         let fetching = false;
+         let pendingUpdate = false;
+         let topSymbolFilter = null;
+         let lastRows = [];
+         let sortState = { key: null, direction: 1 };
+
+         const symbolsInput = document.getElementById("symbolsInput");
+         const intervalSelect = document.getElementById("intervalSelect");
+         const thresholdInput = document.getElementById("thresholdInput");
+         const limitInput = document.getElementById("limitInput");
+         const refreshSelect = document.getElementById("refreshSelect");
+         const refreshButton = document.getElementById("refreshButton");
+         const resultsBody = document.getElementById("resultsBody");
+         const tableHeadRow = document.getElementById("tableHeadRow");
+         const quickActions = document.getElementById("quickActions");
+         const statusDot = document.getElementById("statusDot");
+         const statusText = document.getElementById("statusText");
+         const lastUpdated = document.getElementById("lastUpdated");
+         const currentTimeEl = document.getElementById("currentTime");
+         const nextRefreshEl = document.getElementById("nextRefresh");
+         const ruleSelect = document.getElementById("ruleSelect");
+         const freezeSymbolToggle = document.getElementById("freezeSymbolToggle");
+         const highlightSymbolToggle = document.getElementById("highlightSymbolToggle");
+
+         function escapeHtml(text) {
+            const entities = {
+               "&": "&amp;",
+               "<": "&lt;",
+               ">": "&gt;",
+               '"': "&quot;",
+               "'": "&#39;",
+            };
+            return String(text).replace(/[&<>"']/g, (char) => entities[char]);
+         }
+
+         function formatText(n, d = 4) {
+            const x = parseFloat(n);
+            return isNaN(x) ? "-" : x.toFixed(d);
+         }
+
+         function formatPrice(n) {
+            const x = parseFloat(n);
+            return isNaN(x) ? "-" : x.toFixed(x >= 100 ? 2 : x >= 0.1 ? 4 : 5);
+         }
+
+         function setStatus(text, className) {
+            statusText.textContent = text;
+            statusDot.className = "dot" + (className ? " " + className : "");
+         }
+
+         /* ---------- API ---------- */
+         async function fetchJSON(url) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+         }
+
+         async function fetchTickerAll() {
+            const r = await fetchJSON(`${API_TICKER}?category=linear`);
+            if (r.retCode !== 0)
+               throw new Error(r.retMsg || "Failed to fetch tickers");
+            return r.result.list;
+         }
+
+         async function fetchLongShortRatio(symbol, interval) {
+            try {
+               const url = `${API_LONG_SHORT_RATIO}?category=linear&symbol=${symbol}&period=5min&limit=1`;
+               const r = await fetchJSON(url);
+
+               const latest = r?.result?.list?.[0];
+               if (!latest) return null;
+
+               const buyRatio = parseFloat(latest.buyRatio);
+               const sellRatio = parseFloat(latest.sellRatio);
+
+               if (
+                  !isFinite(buyRatio) ||
+                  !isFinite(sellRatio) ||
+                  sellRatio === 0
+               ) {
+                  return null;
+               }
+               return buyRatio / sellRatio;
+            } catch {
+               return null; // long/short is optional: never fail the whole row
+            }
+         }
+
+         async function fetchOHLC(symbol, interval) {
+            const r = await fetchJSON(
+               `${API_KLINE}?category=linear&symbol=${symbol}&interval=${interval}&limit=${MAX_BARS + 1}`,
+            );
+            if (r.retCode !== 0) throw new Error(r.retMsg);
+            return r.result.list; // newest first
+         }
+
+         async function fetchTopSymbols(
+            filter,
+            limit = parseInt(limitInput.value) || 15,
+         ) {
+            try {
+               const listData = (await fetchTickerAll()).filter((item) =>
+                  item.symbol.endsWith("USDT"),
+               );
+               const descending = (key) => (a, b) =>
+                  Number(b[key]) - Number(a[key]);
+               const ascending = (key) => (a, b) =>
+                  Number(a[key]) - Number(b[key]);
+               const sorters = {
+                  Gainers: descending("price24hPcnt"),
+                  Losers: ascending("price24hPcnt"),
+                  Volume: descending("volume24h"),
+                  turnOver: descending("turnover24h"),
+                  "negative-funding": ascending("fundingRate"),
+                  "positive-funding": descending("fundingRate"),
+               };
+               listData.sort(sorters[filter]);
+               topSymbolFilter = filter;
+
+               const top10Symbols = listData
+                  .slice(0, limit)
+                  .map((item) => item.symbol);
+               symbolsInput.value = top10Symbols.join(", ");
+               updateScreener();
+            } catch (e) {
+               setStatus("Error: " + e.message, "error");
+            }
+         }
+
+         /* ---------- Indicators ---------- */
+         function msToCountdown(ms) {
+            const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+            const pad = (n) => String(n).padStart(2, "0");
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+         }
+
+         function calcStreak(candles, type, rule) {
+            const lastOpen = parseFloat(candles[0][1]);
+            const lastClose = parseFloat(candles[0][4]);
+
+            if (rule === "candle") {
+               // single-candle mode: direction is the colour of the latest candle
+               const isBullCandle = lastClose >= lastOpen;
+               return {
+                  count: type === (isBullCandle ? "bull" : "bear") ? 1 : 0,
+                  gain: ((lastClose - lastOpen) / lastOpen) * 100,
+               };
+            }
+
+            let count = 0;
+
+            for (let i = 0; i < MAX_BARS; i++) {
+               const cur = candles[i],
+                  prev = candles[i + 1];
+               if (!cur || !prev) break;
+
+               const open = parseFloat(cur[1]);
+               const close = parseFloat(cur[4]);
+               const prevClose = parseFloat(prev[4]);
+               const prevOpen = parseFloat(prev[1]);
+
+               const curGreen = close > open;
+               const curRed = close < open;
+               const prevGreen = prevClose > prevOpen;
+               const prevRed = prevClose < prevOpen;
+
+               let condition = false;
+
+               if (rule === "engulfing") {
+                  // engulfing rule: candle engulfing
+                  condition =
+                     type === "bull"
+                        ? prevRed && curGreen && close > prevOpen
+                        : prevGreen && curRed && close < prevOpen;
+               } else if (rule === "strong") {
+                  // strong rule: two candles in the same direction
+                  condition =
+                     type === "bull"
+                        ? prevGreen && curGreen
+                        : prevRed && curRed;
+               } else if (rule === "weak") {
+                  // weak rule: close vs previous open
+                  condition =
+                     type === "bull" ? close >= prevOpen : close <= prevOpen;
+               }
+
+               if (condition) count++;
+               else break;
+            }
+
+            // gain is counted from the open of the first candle in the streak
+            const startOpen = parseFloat(candles[Math.max(count - 1, 0)][1]);
+            const gain = ((lastClose - startOpen) / startOpen) * 100;
+
+            return { count, gain };
+         }
+
+         function pickStreak(bull, bear) {
+            if (bull.count === 0 && bear.count === 0)
+               return { dir: "none", ...bull };
+            return bull.count >= bear.count
+               ? { dir: "bull", ...bull }
+               : { dir: "bear", ...bear };
+         }
+
+         function computeRSI(candles, length = 14) {
+            // Need at least length + 1 candles
+            if (candles.length < length + 1) return null;
+
+            let gains = 0;
+            let losses = 0;
+
+            // Calculate average gain/loss over the first period
+            for (let i = 0; i < length; i++) {
+               const closeNow = parseFloat(candles[i][4]);
+               const closePrev = parseFloat(candles[i + 1][4]);
+               const diff = closeNow - closePrev;
+
+               if (diff > 0) gains += diff;
+               else losses -= diff; // diff is negative
+            }
+
+            let avgGain = gains / length;
+            let avgLoss = losses / length;
+
+            // Wilder smoothing: continue with remaining candles
+            for (let i = length; i < candles.length - 1; i++) {
+               const closeNow = parseFloat(candles[i][4]);
+               const closePrev = parseFloat(candles[i + 1][4]);
+               const diff = closeNow - closePrev;
+
+               const gain = diff > 0 ? diff : 0;
+               const loss = diff < 0 ? -diff : 0;
+
+               avgGain = (avgGain * (length - 1) + gain) / length;
+               avgLoss = (avgLoss * (length - 1) + loss) / length;
+            }
+
+            if (avgLoss === 0) return 100; // cannot divide by zero: RSI max
+
+            const rs = avgGain / avgLoss;
+            const rsiVal = 100 - 100 / (1 + rs);
+
+            return rsiVal;
+         }
+
+         function calculateATR(candles, length = 14) {
+            if (!candles || candles.length < length + 1) return null;
+
+            let trSum = 0;
+
+            // We need `length` true ranges
+            for (let i = 0; i < length; i++) {
+               const curr = candles[i];
+               const prev = candles[i + 1];
+
+               const high = parseFloat(curr[2]);
+               const low = parseFloat(curr[3]);
+               const prevClose = parseFloat(prev[4]);
+
+               const tr = Math.max(
+                  high - low,
+                  Math.abs(high - prevClose),
+                  Math.abs(low - prevClose),
+               );
+
+               trSum += tr;
+            }
+
+            return trSum / length;
+         }
+
+         function calculateATRPercent(candles, length = 14) {
+            const atr = calculateATR(candles, length);
+            if (atr === null) return null;
+            const close = parseFloat(candles[0][4]);
+            return (atr / close) * 100;
+         }
+
+         function countVolumeSpikes(candles, length = 8) {
+            const currentVolume = parseFloat(candles[0][5]);
+
+            let sumVolume = 0;
+            for (let i = 1; i <= length; i++) {
+               sumVolume += parseFloat(candles[i][5]);
+            }
+            const avgVolume = sumVolume / length;
+            const volumeSpikeRatio = currentVolume / avgVolume;
+            return volumeSpikeRatio;
+         }
+
+         /* ---------- Match rules ---------- */
+         function evaluateMatch(gain, funding, longShortRatio) {
+            const hasLongShortRatio =
+               longShortRatio != null && longShortRatio > 0;
+            const bullChecks = [
+               ["Gain ≥ 0.5%", gain >= 0.5],
+               ["Funding −0.3…0.005%", funding <= 0.005 && funding >= -0.3],
+               ["L/S ≤ 1.1", hasLongShortRatio && longShortRatio <= 1.1],
+            ];
+            const bearChecks = [
+               ["Gain ≤ −0.5%", gain <= -0.5],
+               ["Funding > 0.005%", funding > 0.005],
+               ["L/S ≥ 1.5", hasLongShortRatio && longShortRatio >= 1.5],
+            ];
+            const matchChecks = gain < 0 ? bearChecks : bullChecks;
+            return {
+               match: matchChecks.every(([label, passed]) => passed),
+               matchChecks,
+            };
+         }
+
+         /* ---------- Data load ---------- */
+         function countDownUpdateScreener() {
+            if (!freezeSymbolToggle.checked && topSymbolFilter) {
+               fetchTopSymbols(topSymbolFilter);
+            } else {
+               updateScreener();
+            }
+         }
+
+         async function updateScreener() {
+            if (fetching) {
+               pendingUpdate = true;
+               return;
+            }
+            fetching = true;
+            setStatus("Loading...", "loading");
+
+            const symbols = [
+               ...new Set(
+                  symbolsInput.value
+                     .split(",")
+                     .map((x) => x.trim().toUpperCase())
+                     .filter(Boolean),
+               ),
+            ];
+            const interval = intervalSelect.value;
+            const threshold = parseInt(thresholdInput.value) || 3;
+            const rule = document.getElementById("ruleSelect").value;
 
             try {
-              const [candles, longShortRatio] = await Promise.all([
-                fetchOHLC(sym, interval),
-                fetchLongShortRatio(sym, interval),
-              ]);
-              const ticker = tickerMap.get(sym);
-              if (!ticker) throw new Error("Ticker not found");
+               const rows = new Array(symbols.length);
+               const tickerList = await fetchTickerAll();
+               const tickerMap = new Map(tickerList.map((t) => [t.symbol, t]));
+               let cursor = 0;
+               const workerCount = Math.min(OHLC_CONCURRENCY, symbols.length);
 
-              const last = candles[0];
-              const O = last[1],
-                H = last[2],
-                L = last[3],
-                C = last[4];
+               async function worker() {
+                  while (true) {
+                     const i = cursor++;
+                     if (i >= symbols.length) break;
+                     const sym = symbols[i];
 
-              const funding = parseFloat(ticker.fundingRate) * 100;
-              const fundingCountdown = msToCountdown(
-                ticker.nextFundingTime - Date.now()
-              );
-              const fundingInterval = ticker.fundingIntervalHour;
+                     try {
+                        const ticker = tickerMap.get(sym);
+                        if (!ticker) throw new Error("Ticker not found");
+                        const [candles, longShortRatio] = await Promise.all([
+                           fetchOHLC(sym, interval),
+                           fetchLongShortRatio(sym, interval),
+                        ]);
+                        if (candles.length < 2)
+                           throw new Error("Not enough candles");
 
-              const rsi = computeRSI(candles);
-              const volumeSpike = countVolumeSpikes(candles);
-              const atr = calculateATRPercent(candles);
+                        const last = candles[0];
+                        const O = last[1],
+                           H = last[2],
+                           L = last[3],
+                           C = last[4];
 
-              const bull = calcStreak(candles, "bull", rule);
-              const bear = calcStreak(candles, "bear", rule);
-              const streak = pickStreak(bull, bear);
+                        const funding = Number(
+                           (parseFloat(ticker.fundingRate) * 100).toFixed(4),
+                        );
+                        const fundingCountdownMs =
+                           ticker.nextFundingTime - Date.now();
+                        const fundingInterval = ticker.fundingIntervalHour;
 
-              const match =
-                ((streak.gain >= 0.5 && funding <= 0.005 && funding >= -0.3 &&longShortRatio <= 1.1) ||
-                  (streak.gain <= -0.5 && funding > 0.005 && longShortRatio >= 1.5)) && longShortRatio > 0 ;
+                        const rsi = computeRSI(candles);
+                        const volumeSpike = countVolumeSpikes(candles);
+                        const atr = calculateATRPercent(candles);
 
-              const passTreshold = streak.count >= threshold;
+                        const bull = calcStreak(candles, "bull", rule);
+                        const bear = calcStreak(candles, "bear", rule);
+                        const streak = pickStreak(bull, bear);
 
-              const rowClass = highlightSymbolToggle.checked && match
-                ? "row-match"
-                : passTreshold && streak.dir === "bull"
-                  ? "row-bull"
-                  : passTreshold && streak.dir === "bear"
-                  ? "row-bear"
-                  : "row-neutral";
+                        const { match, matchChecks } = evaluateMatch(
+                           streak.gain,
+                           funding,
+                           longShortRatio,
+                        );
+                        const passTreshold = streak.count >= threshold;
 
-              rows[i] = {
-                sym,
-                price: C,
-                funding,
-                fundingCountdown: fundingCountdown.text,
-                fundingHours: fundingCountdown.hours,
-                fundingMinutes: fundingCountdown.minutes,
-                fundingInterval,
-                streakCount: streak.count,
-                streakDir: streak.dir,
-                streakGain: streak.gain,
-                rsi,
-                atr,
-                longShortRatio,
-                volumeSpike,
-                O,
-                H,
-                L,
-                C,
-                match,
-                passTreshold,
-                rowClass,
-              };
+                        rows[i] = {
+                           sym,
+                           price: parseFloat(C),
+                           funding,
+                           fundingCountdownMs,
+                           fundingInterval,
+                           streakCount: streak.count,
+                           streakDir: streak.dir,
+                           streakGain: streak.gain,
+                           rsi,
+                           atr,
+                           longShortRatio,
+                           volumeSpike,
+                           O: +O,
+                           H: +H,
+                           L: +L,
+                           C: +C,
+                           match,
+                           matchChecks,
+                           passTreshold,
+                        };
+                     } catch (e) {
+                        rows[i] = { sym, error: e.message };
+                     }
+                  }
+               }
+
+               await Promise.all(
+                  Array.from({ length: workerCount }, () => worker()),
+               );
+               lastRows = rows;
+               renderRows();
+
+               setStatus("Updated");
+               lastUpdated.textContent =
+                  "Last updated: " + new Date().toLocaleTimeString("en-US");
             } catch (e) {
-              rows[i] = { sym, error: e.message };
+               setStatus("Error: " + e.message, "error");
+            } finally {
+               fetching = false;
+               if (pendingUpdate) {
+                  pendingUpdate = false;
+                  updateScreener();
+               }
             }
-          }
-        }
+         }
 
-        await Promise.all(Array.from({ length: workerCount }, () => worker()));
-        renderRows(rows);
-        fetching = false;
+         /* ---------- Render ---------- */
+         const COLUMNS = [
+            ["symbol", "Symbol", ""],
+            ["price", "Price", "numeric"],
+            ["gain", "Gain %", "numeric"],
+            ["streak", "Streak", "numeric"],
+            ["funding", "Funding", "numeric"],
+            ["nextFunding", "Next Funding", "numeric"],
+            ["rsi", "RSI", "numeric"],
+            ["volumeSpike", "Vol", "numeric"],
+            ["atr", "ATR", "numeric"],
+            ["longShortRatio", "L/S", "numeric"],
+            ["range", "Range", ""],
+            ["match", "Match?", ""],
+         ];
 
-        statusDot.classList.remove("loading");
-        statusText.textContent = "Updated";
-        lastUpdated.textContent =
-          "Last updated: " + new Date().toLocaleTimeString("en-US");
-        countdown = parseInt(refreshSelect.value) || 0;
-      }
+         const SORT_VALUES = {
+            symbol: (r) => r.sym,
+            price: (r) => r.price,
+            gain: (r) => r.streakGain,
+            streak: (r) => r.streakCount * (r.streakDir === "bear" ? -1 : 1),
+            funding: (r) => r.funding,
+            nextFunding: (r) => r.fundingCountdownMs,
+            rsi: (r) => r.rsi,
+            volumeSpike: (r) => r.volumeSpike,
+            atr: (r) => r.atr,
+            longShortRatio: (r) => r.longShortRatio,
+            range: (r) => (r.C - r.L) / (r.H - r.L || 1),
+            match: (r) => Number(r.match),
+         };
 
-      function renderRows(rows) {
-        resultsBody.innerHTML = rows
-          .map((r) => {
-            if (r.error) {
-              return `<tr class="row-neutral"><td>${r.sym}</td><td colspan="11" class="negative">${r.error}</td></tr>`;
+         function renderTableHeader() {
+            tableHeadRow.innerHTML = COLUMNS.map(([key, label, className]) => {
+               const arrow =
+                  sortState.key === key
+                     ? sortState.direction > 0
+                        ? "▲"
+                        : "▼"
+                     : "";
+               return `<th class="${className}" data-key="${key}">${label}<span class="sort-arrow">${arrow}</span></th>`;
+            }).join("");
+         }
+
+         function renderRows() {
+            renderTableHeader();
+            const rows = lastRows.slice();
+
+            if (sortState.key) {
+               const getValue = SORT_VALUES[sortState.key];
+               rows.sort((a, b) => {
+                  if (a.error || b.error) return a.error ? 1 : -1;
+                  const valueA = getValue(a);
+                  const valueB = getValue(b);
+                  if (valueA == null) return 1;
+                  if (valueB == null) return -1;
+                  return (
+                     (valueA > valueB ? 1 : valueA < valueB ? -1 : 0) *
+                     sortState.direction
+                  );
+               });
             }
 
-            const streakClass = r.passTreshold
-              ? r.streakDir === "bull"
-                ? "streak-bull"
-                : "streak-bear"
-              : "streak-neutral";
-              
-            const gainClass = 
-              (r.streakGain > 0 && r.streakCount > 0) 
-                ? "gain-bull" 
-                : (r.streakGain < 0 && r.streakCount > 0)
-                ? "gain-bear" 
-                : "gain-neutral";
+            if (!rows.length) {
+               resultsBody.innerHTML = `<tr><td class="empty-row" colspan="12">No symbols to show. Enter symbols or pick a filter.</td></tr>`;
+               return;
+            }
 
-            const fundingClass = r.funding >= 0 ? "gain-bull" : "gain-bear";
+            resultsBody.innerHTML = rows
+               .map((r) => {
+                  if (r.error) {
+                     return `<tr class="row-neutral"><td class="symbol">${escapeHtml(r.sym)}</td><td colspan="11" class="error-text">${escapeHtml(r.error)}</td></tr>`;
+                  }
 
-            const fundingCountdownClass = r.fundingHours === 0 && r.fundingMinutes <= 5 ? "" : "streak-neutral";
+                  const rowClass =
+                     highlightSymbolToggle.checked && r.match
+                        ? "row-match"
+                        : r.passTreshold && r.streakDir === "bull"
+                          ? "row-bull"
+                          : r.passTreshold && r.streakDir === "bear"
+                            ? "row-bear"
+                            : "row-neutral";
 
-            const rsiClass = r.rsi >= 70 || r.rsi <= 30 ? "gain-warn" : "gain-neutral";
+                  const gainClass =
+                     r.streakCount > 0
+                        ? r.streakGain > 0
+                           ? "gain-bull"
+                           : r.streakGain < 0
+                             ? "gain-bear"
+                             : "gain-neutral"
+                        : "gain-neutral";
 
-            const volumeSpikeClass = r.volumeSpike >= 2 ? "" : "gain-neutral";
+                  const streakArrow =
+                     r.streakDir === "bull"
+                        ? "▲"
+                        : r.streakDir === "bear"
+                          ? "▼"
+                          : "–";
+                  const streakClass =
+                     r.streakDir === "bull"
+                        ? "streak-bull"
+                        : r.streakDir === "bear"
+                          ? "streak-bear"
+                          : "streak-neutral";
 
-            const atrClass = r.atr > 5 ? "" : "gain-neutral";
+                  const fundingClass =
+                     r.funding > 0
+                        ? "gain-bull"
+                        : r.funding < 0
+                          ? "gain-bear"
+                          : "gain-neutral";
+                  const fundingCountdownClass =
+                     r.fundingCountdownMs < 6 * 60 * 1000 ? "" : "gain-neutral";
+                  const rsiClass =
+                     r.rsi >= 70 || r.rsi <= 30 ? "gain-warn" : "gain-neutral";
+                  const volumeSpikeClass =
+                     r.volumeSpike >= 2 ? "" : "gain-neutral";
+                  const atrClass = r.atr > 5 ? "" : "gain-neutral";
+                  const longShortClass =
+                     r.longShortRatio >= 1.35 ||
+                     (r.longShortRatio <= 0.7 && r.longShortRatio > 0)
+                        ? "gain-warn"
+                        : "gain-neutral";
 
-            const longShortClass =
-              r.longShortRatio >= 1.35 || (r.longShortRatio <= 0.7 && r.longShortRatio > 0)
-                ? "gain-warn"
-                : "gain-neutral";
+                  const candleRange = r.H - r.L || 1;
+                  const percentInRange = (price) =>
+                     Math.min(
+                        Math.max(((price - r.L) / candleRange) * 100, 0),
+                        100,
+                     );
+                  const matchTooltip = r.matchChecks
+                     .map(([label, passed]) => (passed ? "✓ " : "✗ ") + label)
+                     .join("  ");
 
-            return `
-            <tr class="${r.rowClass}">
-              <td class="symbol">${r.sym}</td>
-              <td>${fmt(r.price)}</td>
-              <td class="${gainClass}">${
-              r.streakCount > 0 ? fmt(r.streakGain, 2) + "%" : "-"
-            }</td>              
-              <td class="${streakClass}">${r.streakCount}</td>
-              <td class="${fundingClass}">${fmt(r.funding, 4)}%</td>
-              <td class="${fundingCountdownClass}">${r.fundingCountdown} (${r.fundingInterval}h)</td>
-              <td class="${rsiClass}"> ${fmt(r.rsi, 2)}</td>
-              <td class="${volumeSpikeClass}"> ${fmt(r.volumeSpike, 2)}</td>
-              <td class="${atrClass}"> ${fmt(r.atr, 2) + "%"}</td>
-              <td class="${longShortClass}"> ${fmt(r.longShortRatio, 2)}</td>
-              <td class="small-text">O:${fmt(r.O)} H:${fmt(r.H)} L:${fmt(r.L)} C:${fmt(r.C)}</td>
-              <td><span class="badge ${r.match ? "yes" : "no"}">${
-              r.match ? "YES" : "NO"
-            }</span></td>
-            </tr>
-          `;
-          })
-          .join("");
-      }
+                  return `
+      <tr class="${rowClass}">
+        <td class="symbol">${escapeHtml(r.sym)}</td>
+        <td class="numeric bold">${formatPrice(r.price)}</td>
+        <td class="numeric ${gainClass}">${r.streakCount > 0 ? formatText(r.streakGain, 2) + "%" : "-"}</td>
+        <td class="numeric ${streakClass} ${r.passTreshold ? "bold" : ""}">${streakArrow}${r.streakCount > 1 ? " " + r.streakCount : ""}</td>
+        <td class="numeric ${fundingClass}">${formatText(r.funding, 4)}%</td>
+        <td class="numeric ${fundingCountdownClass}">${msToCountdown(r.fundingCountdownMs)}<span class="interval-chip">${r.fundingInterval}h</span></td>
+        <td class="numeric ${rsiClass}">${formatText(r.rsi, 2)}</td>
+        <td class="numeric ${volumeSpikeClass}">${formatText(r.volumeSpike, 2)}</td>
+        <td class="numeric ${atrClass}">${formatText(r.atr, 2)}%</td>
+        <td class="numeric ${longShortClass}">${formatText(r.longShortRatio, 2)}</td>
+        <td title="O ${formatPrice(r.O)}  H ${formatPrice(r.H)}  L ${formatPrice(r.L)}  C ${formatPrice(r.C)}">
+          <span class="range-bar ${r.C >= r.O ? "bull" : "bear"}">
+            <span class="range-open" style="left:${percentInRange(r.O)}%"></span>
+            <span class="range-close" style="left:calc(${percentInRange(r.C)}% - 2px)"></span>
+          </span>
+        </td>
+        <td><span class="badge ${r.match ? "yes" : "no"}" title="${escapeHtml(matchTooltip)}">${r.match ? "YES" : "NO"}</span></td>
+      </tr>
+    `;
+               })
+               .join("");
+         }
 
-      function startAutoRefresh() {
-        if (autoTimer) clearInterval(autoTimer);
-        const sec = parseInt(refreshSelect.value) || 0;
+         /* ---------- Auto refresh ---------- */
+         function startAutoRefresh() {
+            if (autoTimer) clearInterval(autoTimer);
+            const sec = parseInt(refreshSelect.value) || 0;
 
-        if (sec === 0) {
-          nextRefreshEl.textContent = "Next Refresh In: Disabled";
-          return;
-        }
+            if (sec === 0) {
+               nextRefreshEl.textContent = "Next Refresh In: Disabled";
+               return;
+            }
 
-        countdown = sec;
-        nextRefreshEl.textContent = `Next Refresh In: ${countdown}s`;
+            countdown = sec;
+            nextRefreshEl.textContent = `Next Refresh In: ${countdown}s`;
 
-        autoTimer = setInterval(() => {
-          countdown--;
-          if (countdown <= 0) countDownUpdateScreener();
-          nextRefreshEl.textContent = `Next Refresh In: ${countdown}s`;
-        }, 1000);
-      }
+            autoTimer = setInterval(() => {
+               countdown--;
+               if (countdown <= 0) {
+                  countdown = sec;
+                  countDownUpdateScreener();
+               }
+               nextRefreshEl.textContent = `Next Refresh In: ${countdown}s`;
+            }, 1000);
+         }
 
-      setInterval(() => {
-        currentTimeEl.textContent =
-          "Current Time: " + new Date().toLocaleTimeString("en-US");
-      }, 1000);
+         setInterval(() => {
+            currentTimeEl.textContent =
+               "Current Time: " + new Date().toLocaleTimeString("en-US");
+         }, 1000);
 
-      refreshButton.addEventListener("click", updateScreener);
-      refreshSelect.addEventListener("change", startAutoRefresh);
-      intervalSelect.addEventListener("change", updateScreener);
-      thresholdInput.addEventListener("change", updateScreener);
-      limitInput.addEventListener("change", () => {fetchTopSymbols(topSymbolFilter, limitInput.value);});
-      ruleSelect.addEventListener("change", updateScreener);
-      highlightSymbolToggle.addEventListener("change", updateScreener);
+         /* ---------- Events ---------- */
+         tableHeadRow.addEventListener("click", (e) => {
+            const th = e.target.closest("th");
+            if (!th) return;
+            const key = th.dataset.key;
+            if (sortState.key !== key)
+               sortState = { key, direction: key === "symbol" ? 1 : -1 };
+            else if (sortState.direction === -1 && key !== "symbol")
+               sortState.direction = 1;
+            else sortState = { key: null, direction: 1 };
+            renderRows();
+         });
 
-      updateScreener();
-      startAutoRefresh();
-    </script>
-  </body>
+         quickActions.addEventListener("click", (e) => {
+            const button = e.target.closest(".quick-btn");
+            if (button) fetchTopSymbols(button.dataset.filter);
+         });
+
+         symbolsInput.addEventListener("change", () => {
+            topSymbolFilter = null; // a manual list wins over filters
+            updateScreener();
+         });
+         refreshButton.addEventListener("click", countDownUpdateScreener);
+         refreshSelect.addEventListener("change", startAutoRefresh);
+         intervalSelect.addEventListener("change", updateScreener);
+         thresholdInput.addEventListener("change", updateScreener);
+         ruleSelect.addEventListener("change", updateScreener);
+         limitInput.addEventListener("change", () => {
+            if (topSymbolFilter)
+               fetchTopSymbols(topSymbolFilter, limitInput.value);
+         });
+         highlightSymbolToggle.addEventListener("change", renderRows); // no refetch needed
+
+         document.addEventListener("keydown", (e) => {
+            if (
+               /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName) &&
+               e.key !== "Escape"
+            )
+               return;
+            if (e.key === "r" || e.key === "R") countDownUpdateScreener();
+            else if (e.key === "/") {
+               e.preventDefault();
+               symbolsInput.focus();
+               symbolsInput.select();
+            } else if (e.key === "Escape") document.activeElement.blur();
+         });
+
+         renderTableHeader();
+         updateScreener();
+         startAutoRefresh();
+      </script>
+   </body>
 </html>
