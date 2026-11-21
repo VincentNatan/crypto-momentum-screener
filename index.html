@@ -369,14 +369,24 @@
             <button onclick="fetchTopSymbols('negative-funding')" class="quick-btn">Negative Funding</button>
             <button onclick="fetchTopSymbols('positive-funding')" class="quick-btn">Positive Funding</button>
         </div>
+          
 
         <div class="filter-toggle">
+
+          <span>Match Highlight</span>
+            <label class="switch">
+              <input type="checkbox" id="highlightSymbolToggle">
+              <span class="slider"></span>
+            </label>
+  
           <span>Freeze Symbol</span>
           <label class="switch">
-            <input type="checkbox" id="filterToggle">
+            <input type="checkbox" id="freezeSymbolToggle">
             <span class="slider"></span>
           </label>
+
         </div>
+
       </div>
 
       <div class="status-row">
@@ -440,7 +450,8 @@
       const currentTimeEl = document.getElementById("currentTime");
       const nextRefreshEl = document.getElementById("nextRefresh");
       const ruleSelect = document.getElementById("ruleSelect");
-      const filterToggle = document.getElementById("filterToggle");
+      const freezeSymbolToggle = document.getElementById("freezeSymbolToggle");
+      const highlightSymbolToggle = document.getElementById("highlightSymbolToggle");
       let topSymbolFilter = null;
 
       function fmt(n, d = 4) {
@@ -672,7 +683,7 @@
       }
 
       function countDownUpdateScreener(){
-        if (!filterToggle.checked && topSymbolFilter) {
+        if (!freezeSymbolToggle.checked && topSymbolFilter) {
           fetchTopSymbols(topSymbolFilter) 
         } else {
           updateScreener();
@@ -741,7 +752,7 @@
 
               const passTreshold = streak.count >= threshold;
 
-              const rowClass = match
+              const rowClass = highlightSymbolToggle.checked && match
                 ? "row-match"
                 : passTreshold && streak.dir === "bull"
                   ? "row-bull"
@@ -878,6 +889,7 @@
       thresholdInput.addEventListener("change", updateScreener);
       limitInput.addEventListener("change", () => {fetchTopSymbols(topSymbolFilter, limitInput.value);});
       ruleSelect.addEventListener("change", updateScreener);
+      highlightSymbolToggle.addEventListener("change", updateScreener);
 
       updateScreener();
       startAutoRefresh();
