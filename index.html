@@ -4,214 +4,305 @@
       <meta charset="UTF-8" />
       <title>Terminal Screener</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="color-scheme" content="dark" />
+      <meta name="theme-color" content="#000000" />
       <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
       <link
-         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap"
+         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
          rel="stylesheet"
       />
       <style>
          :root {
-            --bg: #050816;
-            --panel: #0b1120;
-            --line: #1f2937;
-            --text: #c5d0e0;
-            --muted: #9ca3af;
-            --up: #3bc56e;
-            --down: #ee5959;
-            --warn: #e3c567;
-            --accent: #2563eb;
-            --match: #20cbff;
+            color-scheme: dark;
+
+            /* surfaces: true black, then three steps up */
+            --bg: #000000;
+            --panel: #141416;
+            --panel-2: #1c1c1e;
+            --fill: #2c2c2e;
+            --line: rgba(255, 255, 255, 0.08);
+
+            /* text: primary, secondary, tertiary */
+            --text: #d1d1d6;
+            --muted: rgba(235, 235, 245, 0.6);
+            --faint: rgba(235, 235, 245, 0.38);
+
+            /* system colours (dark) */
+            --up: #30d158;
+            --down: #ff453a;
+            --warn: #ffd60a;
+            --accent: #0a84ff;
+            --accent-light: #64b5ff;
+            --match: #64d2ff;
+
+            --font:
+               -apple-system, BlinkMacSystemFont, "SF Pro Text",
+               "SF Pro Display", "Inter", system-ui, sans-serif;
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
          }
+
          * {
             box-sizing: border-box;
          }
+         ::selection {
+            background: rgba(10, 132, 255, 0.4);
+         }
          body {
             margin: 0;
-            font-family: "Inter", system-ui, sans-serif;
+            font-family: var(--font);
+            font-size: 14px;
+            letter-spacing: -0.011em;
             background: var(--bg);
             color: var(--text);
+            -webkit-font-smoothing: antialiased;
          }
          .wrapper {
             max-width: 1400px;
             margin: auto;
-            padding: 30px 16px 40px;
+            padding: 28px 20px 32px;
          }
+
+         /* ---------- Title ---------- */
          h1 {
-            margin: 0 0 6px;
+            margin: 0 0 4px;
             font-size: 30px;
-            font-weight: 600;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
          }
          .subtitle {
-            margin-bottom: 18px;
-            font-size: 13px;
+            max-width: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.35;
             color: var(--muted);
          }
+
+         /* ---------- Form fields ---------- */
          label {
-            font-size: 13px;
+            padding-left: 2px;
+            font-size: 12px;
+            font-weight: 500;
             color: var(--muted);
          }
          input,
          select {
-            padding: 12px 14px;
-            border-radius: 12px;
-            border: 1px solid #374151;
-            background: #020617;
-            color: #fff;
-            font-size: 14px;
+            padding: 9px 13px;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            background: var(--fill);
+            color: var(--text);
+            font: inherit;
+            font-size: 15px;
+            transition:
+               box-shadow 0.2s var(--ease),
+               background 0.2s var(--ease);
+         }
+         input:hover,
+         select:hover {
+            background: #29292c;
+         }
+         input:focus,
+         select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.45);
          }
          :focus-visible {
             outline: 2px solid var(--accent);
             outline-offset: 2px;
          }
+         select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 32px;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%23ebebf5' stroke-opacity='.6' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 11px center;
+         }
+         @media (hover: none) {
+            /* 16px stops iPad/iPhone Safari from zooming on focus */
+            input,
+            select {
+               font-size: 16px;
+            }
+         }
 
+         /* ---------- Controls card ---------- */
          .controls {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 14px;
             align-items: flex-end;
-            background: radial-gradient(circle at top left, #111827, #020617);
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid var(--line);
-            margin-bottom: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+            border-radius: 18px;
+            background: var(--panel);
          }
          .control-group {
             display: flex;
             flex-direction: column;
-            min-width: 100px;
-            gap: 4px;
+            min-width: 96px;
+            gap: 5px;
          }
          .control-group.threshold {
             display: none;
          }
          .btn {
-            padding: 12px 22px;
-            border-radius: 99px;
-            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            padding: 10px 24px;
             border: none;
+            border-radius: 999px;
+            background: var(--accent);
             color: #fff;
-            cursor: pointer;
+            font: inherit;
             font-size: 15px;
-            font-weight: 500;
-            transition: transform 0.1s;
+            font-weight: 600;
+            cursor: pointer;
+            transition:
+               transform 0.12s var(--ease),
+               filter 0.2s var(--ease);
+         }
+         .btn:hover {
+            filter: brightness(1.12);
          }
          .btn:active {
             transform: scale(0.96);
          }
 
+         /* ---------- Quick actions ---------- */
          .quick-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
-            gap: 12px;
             flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
          }
          .quick-actions {
             display: flex;
-            gap: 10px;
             flex-wrap: wrap;
+            gap: 8px;
          }
          .quick-btn {
-            padding: 8px 14px;
-            border-radius: 25px;
-            background: var(--panel);
-            border: 1px solid var(--line);
-            color: #e5e7eb;
+            padding: 7px 15px;
+            border: none;
+            border-radius: 999px;
+            background: var(--panel-2);
+            color: var(--muted);
+            font: inherit;
             font-size: 13px;
-            cursor: pointer;
-            transition: all 0.15s;
+            font-weight: 500;
             white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.15s var(--ease);
          }
          .quick-btn:hover {
-            background: #111827;
-            border-color: #2563eb;
-            color: #93c5fd;
+            background: var(--fill);
+            color: var(--text);
          }
          .quick-btn:active {
             transform: scale(0.96);
          }
          .quick-btn:focus {
-            background: rgba(37, 99, 235, 0.15);
-            border-color: #2563eb;
-            color: #bfdbfe;
+            outline: none;
+            background: rgba(10, 132, 255, 0.2);
+            color: var(--accent-light);
          }
+
+         /* ---------- iOS-style switches ---------- */
          .filter-toggle {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
             font-size: 13px;
             color: var(--muted);
-            gap: 8px;
-            flex-wrap: wrap;
          }
          .filter-toggle .spacer {
             width: 10px;
          }
          .switch {
             position: relative;
-            width: 42px;
-            height: 22px;
             display: inline-block;
+            flex: none;
+            width: 38px;
+            height: 22px;
          }
          .switch input {
             display: none;
          }
          .slider {
             position: absolute;
-            cursor: pointer;
-            background: #374151;
-            border-radius: 999px;
             inset: 0;
-            transition: 0.2s;
+            border-radius: 999px;
+            background: #39393d;
+            cursor: pointer;
+            transition: background 0.25s var(--ease);
          }
          .slider:before {
             content: "";
             position: absolute;
-            height: 16px;
-            width: 16px;
-            left: 3px;
-            bottom: 3px;
-            background: #fff;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
-            transition: 0.2s;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+            transition: transform 0.25s var(--ease);
          }
          input:checked + .slider {
-            background: var(--accent);
+            background: var(--up);
          }
          input:checked + .slider:before {
-            transform: translateX(20px);
+            transform: translateX(16px);
          }
 
+         /* ---------- Status ---------- */
          .status-row {
             display: flex;
             justify-content: space-between;
-            gap: 12px;
             flex-wrap: wrap;
-            margin-bottom: 6px;
-            font-size: 13px;
+            gap: 12px;
+            margin-bottom: 4px;
+            font-size: 12px;
             color: var(--muted);
+            font-variant-numeric: tabular-nums;
          }
          .dot {
-            width: 8px;
-            height: 8px;
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            margin-right: 9px;
             border-radius: 50%;
             background: var(--up);
-            display: inline-block;
-            margin-right: 6px;
+            box-shadow: 0 0 0 3px rgba(48, 209, 88, 0.16);
          }
          .dot.loading {
-            background: #facc15;
+            background: var(--warn);
+            box-shadow: 0 0 0 3px rgba(255, 214, 10, 0.16);
+            animation: pulse 1.2s ease-in-out infinite;
          }
          .dot.error {
             background: var(--down);
+            box-shadow: 0 0 0 3px rgba(255, 69, 58, 0.16);
+         }
+         @keyframes pulse {
+            50% {
+               opacity: 0.35;
+            }
          }
 
+         /* ---------- Table ---------- */
          .table-wrapper {
+            margin-top: 12px;
             overflow-x: auto;
-            border-radius: 12px;
-            background: #020617;
+            border-radius: 18px;
+            background: var(--panel);
+            scrollbar-width: thin;
+            scrollbar-color: #3a3a3c transparent;
          }
          table {
             width: 100%;
@@ -219,56 +310,86 @@
             font-size: 13px;
          }
          th {
-            background: #030712;
-            padding: 9px 10px;
-            color: var(--muted);
-            border-bottom: 1px solid #111827;
+            padding: 12px 14px 10px;
+            border-bottom: 1px solid var(--line);
             text-align: left;
+            font-size: 11px;
             font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            color: var(--faint);
+            background: transparent;
             cursor: pointer;
             user-select: none;
-            white-space: nowrap;
+            transition: color 0.15s var(--ease);
          }
          th:hover {
             color: var(--text);
+         }
+         th .sort-arrow {
+            display: inline-block;
+            width: 12px;
+            margin-left: 4px;
+            color: var(--accent);
          }
          th.numeric,
          td.numeric {
             font-variant-numeric: tabular-nums;
          }
-         th .sort-arrow {
-            display: inline-block;
-            width: 10px;
-            color: var(--accent);
-         }
          td {
-            padding: 9px 10px;
+            padding: 9px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             white-space: nowrap;
+         }
+         tbody tr:last-child td {
+            border-bottom: none;
          }
          td.symbol {
             font-weight: 600;
+            letter-spacing: -0.015em;
          }
-         tbody tr.row-bull td:first-child {
-            box-shadow: inset 3px 0 0 var(--up);
+
+         /* left indicator: a small rounded bar instead of a hard edge */
+         tbody tr td:first-child {
+            position: relative;
+            padding-left: 24px;
          }
-         tbody tr.row-bear td:first-child {
-            box-shadow: inset 3px 0 0 var(--down);
+         tbody tr td:first-child::before {
+            content: "";
+            position: absolute;
+            left: 10px;
+            top: 8px;
+            bottom: 8px;
+            width: 3px;
+            border-radius: 3px;
+            background: #3a3a3c;
          }
-         tbody tr.row-neutral td:first-child {
-            box-shadow: inset 3px 0 0 #4b5563;
+         tbody tr.row-bull td:first-child::before {
+            background: var(--up);
          }
-         tbody tr.row-match {
-            background: rgba(37, 204, 255, 0.16);
+         tbody tr.row-bear td:first-child::before {
+            background: var(--down);
          }
-         tbody tr.row-match td:first-child {
-            box-shadow: inset 4px 0 0 var(--match);
+         tbody tr.row-match td:first-child::before {
+            background: var(--match);
+            box-shadow: 0 0 10px rgba(100, 210, 255, 0.55);
          }
-         tbody tr.row-match:hover {
-            background: rgba(37, 204, 255, 0.26);
+
+         tbody tr {
+            transition: background 0.15s var(--ease);
          }
          tbody tr:hover {
-            background: rgba(151, 188, 247, 0.15);
+            background: rgba(255, 255, 255, 0.08);
          }
+         tbody tr.row-match {
+            background: rgba(100, 210, 255, 0.1);
+         }
+         tbody tr.row-match:hover {
+            background: rgba(100, 210, 255, 0.17);
+         }
+
+         /* ---------- Value colours ---------- */
          .streak-bull,
          .gain-bull {
             color: var(--up);
@@ -282,60 +403,98 @@
             color: var(--muted);
          }
          .gain-warn {
-            color: var(--warn)
+            color: var(--warn);
          }
          .gain-hit {
-             color: #dce6f5;
-          }
+            color: var(--text);
+         }
          .bold {
             font-weight: 600;
          }
+
+         /* price flash: the number flashes green or red, then slowly fades back */
+         .price-up {
+            animation: price-up 1.3s ease-out;
+         }
+         .price-down {
+            animation: price-down 1.3s ease-out;
+         }
+         @keyframes price-up {
+            0%,
+            12% {
+               color: var(--up);
+            }
+            100% {
+               color: var(--text);
+            }
+         }
+         @keyframes price-down {
+            0%,
+            12% {
+               color: var(--down);
+            }
+            100% {
+               color: var(--text);
+            }
+         }
+
+         /* ---------- Badge, chip ---------- */
          .badge {
-            padding: 2px 8px;
+            display: inline-block;
+            min-width: 40px;
+            padding: 2px 10px;
             border-radius: 999px;
-            font-size: 12px;
+            text-align: center;
+            font-size: 11px;
             font-weight: 600;
+            letter-spacing: 0.04em;
          }
          .badge.yes {
-             background: rgba(63, 182, 139, 0.18);
-             color: #30cf95;
-          }
-          .badge.no {
-             background: rgba(229, 99, 110, 0.16);
-             color: #ec4c59;
-          }
-         .interval-chip {
-            font-size: 11px;
-            padding: 1px 6px;
-            border-radius: 6px;
-            background: #111827;
-            color: var(--muted);
-            margin-left: 6px;
+            background: rgba(48, 209, 88, 0.16);
+            color: var(--up);
          }
+         .badge.no {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(235, 235, 245, 0.4);
+         }
+         .interval-chip {
+            margin-left: 8px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+         }
+
+         /* ---------- Range bar ---------- */
          .range-bar {
             position: relative;
             display: inline-block;
             width: 120px;
-            height: 6px;
-            border-radius: 3px;
-            background: #1f2937;
-            vertical-align: middle;
-         }
-         .range-close {
-            position: absolute;
-            top: -3px;
-            width: 4px;
-            height: 12px;
+            height: 4px;
             border-radius: 2px;
-            background: var(--muted);
+            background: rgba(255, 255, 255, 0.12);
+            vertical-align: middle;
          }
          .range-open {
             position: absolute;
-            top: -1px;
-            width: 1px;
+            top: -3px;
+            width: 2px;
+            height: 10px;
+            margin-left: -1px;
+            border-radius: 1px;
+            background: rgba(255, 255, 255, 0.5);
+         }
+         .range-close {
+            position: absolute;
+            top: -2px;
+            width: 8px;
             height: 8px;
-            background: #e5e7eb;
-            opacity: 0.75;
+            margin-left: -2px; /* the script offsets by 2px; this centres the dot */
+            border-radius: 50%;
+            background: var(--muted);
+            box-shadow: 0 0 0 2px var(--panel);
          }
          .range-bar.bull .range-close {
             background: var(--up);
@@ -343,13 +502,34 @@
          .range-bar.bear .range-close {
             background: var(--down);
          }
+
+         /* ---------- Messages ---------- */
          .error-text {
             color: var(--down);
          }
          .empty-row {
-            padding: 30px;
+            padding: 36px;
             text-align: center;
             color: var(--muted);
+         }
+
+         /* ---------- Small screens, reduced motion ---------- */
+         @media (max-width: 720px) {
+            .wrapper {
+               padding: 28px 14px 40px;
+            }
+            h1 {
+               font-size: 24px;
+            }
+            .controls {
+               padding: 14px;
+            }
+         }
+         @media (prefers-reduced-motion: reduce) {
+            * {
+               animation: none !important;
+               transition: none !important;
+            }
          }
       </style>
    </head>
@@ -357,7 +537,8 @@
       <div class="wrapper">
          <h1>Terminal Screener - Bybit</h1>
          <div class="subtitle">
-            A terminal-style screener for Bybit perpetuals: streaks, funding, RSI, ATR and long/short ratio in one live table.
+            A terminal-style screener for Bybit perpetuals: streaks, funding,
+            RSI, ATR and long/short ratio in one live table.
          </div>
 
          <div class="controls">
@@ -365,6 +546,7 @@
                <label for="symbolsInput">Symbols</label>
                <input
                   id="symbolsInput"
+                  spellcheck="false"
                   value="BTCUSDT, ETHUSDT, SOLUSDT, DOGEUSDT"
                />
             </div>
@@ -504,6 +686,7 @@
          let topSymbolFilter = null;
          let lastRows = [];
          let sortState = { key: null, direction: 1 };
+         const previousPrices = new Map();
 
          const symbolsInput = document.getElementById("symbolsInput");
          const intervalSelect = document.getElementById("intervalSelect");
@@ -520,8 +703,11 @@
          const currentTimeEl = document.getElementById("currentTime");
          const nextRefreshEl = document.getElementById("nextRefresh");
          const ruleSelect = document.getElementById("ruleSelect");
-         const freezeSymbolToggle = document.getElementById("freezeSymbolToggle");
-         const highlightSymbolToggle = document.getElementById("highlightSymbolToggle");
+         const freezeSymbolToggle =
+            document.getElementById("freezeSymbolToggle");
+         const highlightSymbolToggle = document.getElementById(
+            "highlightSymbolToggle",
+         );
 
          function escapeHtml(text) {
             const entities = {
@@ -894,9 +1080,20 @@
                         );
                         const passTreshold = streak.count >= threshold;
 
+                        const price = parseFloat(C);
+                        const previousPrice = previousPrices.get(sym);
+                        const priceChange =
+                           previousPrice == null || previousPrice === price
+                              ? null
+                              : price > previousPrice
+                                ? "up"
+                                : "down";
+                        previousPrices.set(sym, price);
+
                         rows[i] = {
                            sym,
-                           price: parseFloat(C),
+                           price,
+                           priceChange,
                            funding,
                            fundingCountdownMs,
                            fundingInterval,
@@ -1039,21 +1236,23 @@
                           ? "▼"
                           : "–";
                   const streakClass = !r.passTreshold
-                    ? "streak-neutral"
-                    : r.streakDir === "bull"
-                      ? "streak-bull"
-                      : r.streakDir === "bear"
-                        ? "streak-bear"
-                        : "streak-neutral";
+                     ? "streak-neutral"
+                     : r.streakDir === "bull"
+                       ? "streak-bull"
+                       : r.streakDir === "bear"
+                         ? "streak-bear"
+                         : "streak-neutral";
 
                   const fundingClass =
-                     r.funding > 0
+                     r.funding > 0.005
                         ? "gain-bull"
                         : r.funding < 0
                           ? "gain-bear"
                           : "gain-neutral";
                   const fundingCountdownClass =
-                     r.fundingCountdownMs < 6 * 60 * 1000 ? "gain-hit" : "gain-neutral";
+                     r.fundingCountdownMs < 6 * 60 * 1000
+                        ? "gain-hit"
+                        : "gain-neutral";
                   const rsiClass =
                      r.rsi >= 70 || r.rsi <= 30 ? "gain-warn" : "gain-neutral";
                   const volumeSpikeClass =
@@ -1078,13 +1277,13 @@
                   return `
       <tr class="${rowClass}">
         <td class="symbol">${escapeHtml(r.sym)}</td>
-        <td class="numeric">${formatPrice(r.price)}</td>
+        <td class="numeric ${r.priceChange ? "price-" + r.priceChange : ""}">${formatPrice(r.price)}</td>
         <td class="numeric ${gainClass}">${r.streakCount > 0 ? formatText(r.streakGain, 2) + "%" : "-"}</td>
         <td class="numeric ${streakClass}">${streakArrow}${r.streakCount > 1 ? " " + r.streakCount : ""}</td>
         <td class="numeric ${fundingClass}">${formatText(r.funding, 4)}%</td>
         <td class="numeric ${fundingCountdownClass}">${msToCountdown(r.fundingCountdownMs)}<span class="interval-chip">${r.fundingInterval}h</span></td>
         <td class="numeric ${rsiClass}">${formatText(r.rsi, 2)}</td>
-        <td class="numeric ${volumeSpikeClass}">${formatText(r.volumeSpike, 2)}</td>
+        <td class="numeric ${volumeSpikeClass}">${isFinite(r.volumeSpike) ? formatText(r.volumeSpike, 2) + "×" : "-"}</td>
         <td class="numeric ${atrClass}">${formatText(r.atr, 2)}%</td>
         <td class="numeric ${longShortClass}">${formatText(r.longShortRatio, 2)}</td>
         <td title="O ${formatPrice(r.O)}  H ${formatPrice(r.H)}  L ${formatPrice(r.L)}  C ${formatPrice(r.C)}">
@@ -1098,6 +1297,9 @@
     `;
                })
                .join("");
+
+            // the flash only plays once: sorting or toggling re-renders without replaying it
+            lastRows.forEach((r) => (r.priceChange = null));
          }
 
          /* ---------- Auto refresh ---------- */
