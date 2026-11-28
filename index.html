@@ -414,14 +414,14 @@
 
          /* price flash: the number flashes green or red, then slowly fades back */
          .price-up {
-            animation: price-up 1.3s ease-out;
+            animation: price-up 0.7s ease-out;
          }
          .price-down {
-            animation: price-down 1.3s ease-out;
+            animation: price-down 0.7s ease-out;
          }
          @keyframes price-up {
             0%,
-            12% {
+            65% {
                color: var(--up);
             }
             100% {
@@ -430,7 +430,7 @@
          }
          @keyframes price-down {
             0%,
-            12% {
+            65% {
                color: var(--down);
             }
             100% {
@@ -983,17 +983,17 @@
          function evaluateMatch(gain, funding, longShortRatio) {
             const hasLongShortRatio =
                longShortRatio != null && longShortRatio > 0;
-            const bullChecks = [
+            const bigFundingChecks = [
                ["Gain ≥ 0.5%", gain >= 0.5],
-               ["Funding −0.3…0.03%", funding <= 0.03 && funding >= -0.3],
+               ["Funding 0.005…0.03%", funding <= 0.03 && funding >= 0.005],
                ["L/S ≤ 1.1", hasLongShortRatio && longShortRatio <= 1.1],
             ];
-            const bearChecks = [
-               ["Gain ≤ −0.5%", gain <= -0.5],
-               ["Funding > 0.005%", funding > 0.005],
-               ["L/S ≥ 1.5", hasLongShortRatio && longShortRatio >= 1.5],
+            const smallFundingChecks = [
+               ["Gain ≥ 0.5%", gain >= 0.5],
+               ["Funding < 0.005%", funding < 0.005],
+               ["L/S ≤ 1.8", hasLongShortRatio && longShortRatio <= 1.8],
             ];
-            const matchChecks = gain < 0 ? bearChecks : bullChecks;
+            const matchChecks = funding < 0.005 ? smallFundingChecks : bigFundingChecks;
             return {
                match: matchChecks.every(([label, passed]) => passed),
                matchChecks,
